@@ -1,6 +1,7 @@
 const cloudinary = require("cloudinary").v2;
 const Event = require('../models/Event'); // Assuming you have a Debate model
-const User = require('../models/User'); // Assuming you have a User model
+const User = require('../models/User'); // Assuming you have a User model/
+const ticketingSystem = 
 
 // Configure Cloudinary
 cloudinary.config({
@@ -24,10 +25,12 @@ exports.createEvent = async (req, res) => {
     // Validate each ticket category
     for (const ticket of tickets) {
       if (
+
         typeof ticket.category !== "number" ||
         typeof ticket.price !== "string" ||
         typeof ticket.desc !== "string" ||
         typeof ticket.seats_available !== "number"
+
       ) {
         return res.status(400).json({
           success: false,
