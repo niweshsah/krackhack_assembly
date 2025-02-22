@@ -1,0 +1,14 @@
+[package]
+name = "event_ticketing"
+version = "1.0.0"
+authors = []
+
+[addresses]
+event_ticketing = "0x712126eae6719d5eec155ecbbdca24138926cef127d4d5b9aaa8642acce200fd"
+
+aptos_framework = "0x1"
+
+[dependencies]
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-framework.git", subdir = "aptos-framework", rev = "mainnet" }
+
+AptosToken = { git = "https://github.com/aptos-labs/aptos-framework.git", subdir = "aptos-token", rev = "mainnet" }
