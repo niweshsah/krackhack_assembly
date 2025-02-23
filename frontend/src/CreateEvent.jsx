@@ -208,7 +208,6 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Plus, Trash2 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
-<<<<<<< HEAD
 import { createNewEvent } from './Actions/Event';
 import { TicketingSystem } from '../../nft_code/dist/main_nft_export';
 import Cookies from "js-cookie";
@@ -223,7 +222,6 @@ const EventCreationForm = () => {
   const [organiser, setOrganiser] = useState('');
   const [artist, setArtist] = useState('');
 
-=======
 import { createNewEvent } from './Actions/Event'
 // import TicketingSystem from '../../nft_code/dist/main_nft'
 import {TicketingSystem} from '../../nft_code/dist/main_nft_export'
@@ -254,7 +252,6 @@ const EventCreationForm = ({address}) => {
     Date_and_Time: { date: '', time: '' },
     venue: '',
   });
->>>>>>> ecdb0048e3be76c541f90bba1b5f2796de4158ab
   const dispatch = useDispatch();
   const [tickets, setTickets] = useState([
     { category: '', price: 0, desc: '', seats_available: 0 }

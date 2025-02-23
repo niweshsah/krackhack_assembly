@@ -26,12 +26,9 @@ const Header = ({ isSignedIn = false }) => {
         </Link>
       );
     }
-<<<<<<< HEAD
     else {
       return (
-=======
     return (
->>>>>>> ecdb0048e3be76c541f90bba1b5f2796de4158ab
       <Link to="/signup" className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
         <User className="w-5 h-5 text-white" />
         <span className="text-white">Sign Up</span>

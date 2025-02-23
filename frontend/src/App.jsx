@@ -13,12 +13,10 @@ import { useSelector } from 'react-redux';
 import { TicketingSystem } from '../../nft_code/dist/main_nft_export';
 
 function App() {
-<<<<<<< HEAD
   const { isAuthenticated } = useSelector((state) => state.user)
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
-=======
   const [wallet, setWallet] = useState(null);
   const [walletAddress, setWalletAddress] = useState("");
   const [isConnected, setIsConnected] = useState(false);
@@ -178,7 +176,6 @@ function App() {
             <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         )}
->>>>>>> ecdb0048e3be76c541f90bba1b5f2796de4158ab
         <Header isSignedIn={isAuthenticated} />
         <div className="flex-grow">
           <Routes>
