@@ -16,6 +16,7 @@
     "@shadcn/ui": "^0.0.4",
     "@tailwindcss/vite": "^4.0.8",
     "axios": "^1.7.9",
+    "buffer": "^6.0.3",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",

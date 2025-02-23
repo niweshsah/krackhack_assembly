@@ -290,6 +290,36 @@ class TicketingSystem {
             }
         });
     }
+    func() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+            const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
+            // const user1key = new Ed25519PrivateKey("0x0d2942f0a8ab3d057e426b0f8bdcb3a639d359f91a56a1ee761c4169db06351e");
+            // // gaurav secret key
+            // const user1 = Account.fromPrivateKey({ privateKey: user1key });
+            // user1.accountAddress
+            // const users = [user1];
+            //   await ticketing.initializeAccounts(organizer, users);
+            // Print initial balances
+            //   const accounts: AccountInfo[] = [
+            //       { name: "Organizer", account: organizer },
+            //       ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
+            //   ];
+            //   await printBalances(accounts);
+            //   console.log('\n Organiser Account Address:', organizer.accountAddress);
+            //   console.log('\n account type: ', typeof organizer);
+            //   console.log('\n organiser:', organizer);
+            // Create collection
+            console.log("\n2. Creating Ticket Collection");
+            console.log("--------------------------");
+            const collectionInfo = {
+                name: "Concert Tickets10",
+                uri: "https://example.com/tickets",
+                description: "Exclusive event tickets.",
+            };
+            yield this.createCollection(organizer, collectionInfo);
+        });
+    }
 }
 // =============== Main Function ===============
 function main() {
@@ -310,6 +340,7 @@ function main() {
             const user1key = new Ed25519PrivateKey("0x0d2942f0a8ab3d057e426b0f8bdcb3a639d359f91a56a1ee761c4169db06351e");
             // gaurav secret key
             const user1 = Account.fromPrivateKey({ privateKey: user1key });
+            user1.accountAddress;
             const users = [user1];
             //   await ticketing.initializeAccounts(organizer, users);
             // Print initial balances
