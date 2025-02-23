@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Account, Aptos, AptosConfig, Network, } from "@aptos-labs/ts-sdk";
+import { Account, Aptos, AptosConfig, Network, Ed25519PrivateKey, } from "@aptos-labs/ts-sdk";
 // import {  } from "aptos";
 // =============== Constants ===============
 const CONFIG = {
@@ -300,9 +300,11 @@ function main() {
             // Initialize accounts
             console.log("\n1. Creating Accounts");
             console.log("-------------------");
-            const organizer = Account.generate();
+            //   const organizer = Account.generate();
             const users = [Account.generate(), Account.generate()];
-            yield ticketing.initializeAccounts(organizer, users);
+            const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+            const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
+            //   await ticketing.initializeAccounts(organizer, users);
             // Print initial balances
             const accounts = [
                 { name: "Organizer", account: organizer },

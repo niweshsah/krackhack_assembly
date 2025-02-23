@@ -7,6 +7,7 @@ import {
   Network,
   TransactionResponse,
   AccountAddress,
+  Ed25519PrivateKey,
 } from "@aptos-labs/ts-sdk";
 
 // import {  } from "aptos";
@@ -408,11 +409,14 @@ async function main() {
       console.log("-------------------");
 
       
-      const organizer = Account.generate();
+    //   const organizer = Account.generate();
       const users = [Account.generate(), Account.generate()];
 
+      const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+        const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
 
-      await ticketing.initializeAccounts(organizer, users);
+
+    //   await ticketing.initializeAccounts(organizer, users);
 
       // Print initial balances
       const accounts: AccountInfo[] = [
