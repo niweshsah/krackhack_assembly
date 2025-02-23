@@ -129,6 +129,8 @@ import {
     Aptos,
     AptosConfig,
     Network,
+    Ed25519PrivateKey,
+
 } from "@aptos-labs/ts-sdk";
 
 // Alice's address 
@@ -149,13 +151,18 @@ const checkAssets = async () => {
         console.log("Fetching assets for Alice...");
 
         // Convert address from string to AccountAddress
-        const aliceAddress = AccountAddress.fromString(ALICE_ADDRESS_HEX);
+        // const aliceAddress = AccountAddress.fromString(ALICE_ADDRESS_HEX);
 
-        console.log("address: ",aliceAddress);
+        const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+        const backend = Account.fromPrivateKey({ privateKey: backendPrivateKey });
+
+
+
+        console.log("address: ",backend.accountAddress);
 
         // Fetch Alice's digital assets
         const sellerTickets = await aptos.getOwnedDigitalAssets({
-            ownerAddress: aliceAddress,
+            ownerAddress: backend.accountAddress,
         });
 
         console.log("seller: ",sellerTickets );

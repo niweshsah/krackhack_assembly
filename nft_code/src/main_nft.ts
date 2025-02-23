@@ -142,6 +142,7 @@ class TicketingSystem {
       throw new TransactionError("Max retry attempts reached", lastError);
   }
 
+
   // =============== Public Methods ===============
   async printBalances(accounts: AccountInfo[]): Promise<void> {
       try {
@@ -192,6 +193,7 @@ class TicketingSystem {
           throw new TicketingError("Failed to mint ticket NFTs", error);
       }
   }
+
 
   async viewAccountTokens(accountAddress: string, ticketType: string): Promise<any> {
       try {
@@ -404,6 +406,8 @@ async function main() {
       // Initialize accounts
       console.log("\n1. Creating Accounts");
       console.log("-------------------");
+
+      
       const organizer = Account.generate();
       const users = [Account.generate(), Account.generate()];
 

@@ -7,10 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Aptos, AptosConfig, Network, } from "@aptos-labs/ts-sdk";
+import { Account, Aptos, AptosConfig, Network, AccountAddress, Ed25519PrivateKey, } from "@aptos-labs/ts-sdk";
 // =============== Constants ===============
 const CONFIG = {
-    INITIAL_BALANCE: 100000000, // 1 APT
     TICKET_PRICES: {
         VIP: 10000000, // 0.10 APT for VIP tickets
         NORMAL: 5000000, // 0.05 APT for normal tickets
@@ -24,11 +23,6 @@ const CONFIG = {
     MAX_RETRIES: 3,
     RETRY_DELAY: 1000, // 1 second
     MINT_DELAY: 1000, // 1 second between mints
-    ADDRESSES: {
-        ORGANIZER: "0xa53709fb9b81a068f5c4868c62c2513463411995184fb00a7e3c6166b58c9cd1",
-        USER1: "0xb5f96a6656d1b7353ea188666db490bdd9091ae7a987a75432e8c742c1995253",
-        USER2: "0x3e6d013285fe67aec5b7c757498378f31f1b188ff1796488baf0a1e88640edf0"
-    }
 };
 // =============== Custom Error Classes ===============
 class TicketingError extends Error {
@@ -63,6 +57,12 @@ class TicketingSystem {
         this.aptos = new Aptos(this.config);
     }
     // =============== Private Helper Methods ===============
+    ensureAccountAddress(address) {
+        if (typeof address === 'string') {
+            return AccountAddress.fromString(address);
+        }
+        return address;
+    }
     waitWithRetry(hash) {
         return __awaiter(this, void 0, void 0, function* () {
             for (let attempt = 1; attempt <= CONFIG.MAX_RETRIES; attempt++) {
@@ -79,28 +79,100 @@ class TicketingSystem {
             }
         });
     }
+    submitTransactionWithRetry(signer, transaction) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            let lastError;
+            console.log("Submitting transaction...");
+            for (let attempt = 1; attempt <= CONFIG.MAX_RETRIES; attempt++) {
+                try {
+                    const committedTxn = yield this.aptos.signAndSubmitTransaction({
+                        signer,
+                        transaction,
+                    });
+                    yield this.waitWithRetry(committedTxn.hash);
+                    return committedTxn.hash;
+                }
+                catch (error) {
+                    lastError = error;
+                    if (((_a = error === null || error === void 0 ? void 0 : error.data) === null || _a === void 0 ? void 0 : _a.error_code) === "invalid_transaction_update") {
+                        yield new Promise((resolve) => setTimeout(resolve, CONFIG.RETRY_DELAY * attempt));
+                        continue;
+                    }
+                    throw new TransactionError("Transaction submission failed", error);
+                }
+            }
+            throw new TransactionError("Max retry attempts reached", lastError);
+        });
+    }
     // =============== Public Methods ===============
-    printBalances(accounts) {
+    printBalance(address, name) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("\nCurrent Balances:");
-                for (const { name, address } of accounts) {
-                    const balance = yield this.aptos.getAccountAPTAmount({
-                        accountAddress: address,
-                    });
-                    console.log(`${name} Balance: ${balance / 100000000} APT`);
-                }
-                console.log();
+                const accountAddress = this.ensureAccountAddress(address);
+                const balance = yield this.aptos.getAccountAPTAmount({
+                    accountAddress: accountAddress.toString(),
+                });
+                console.log(`${name} Balance: ${balance / 100000000} APT`);
             }
             catch (error) {
-                throw new TicketingError("Failed to fetch account balances", error);
+                throw new TicketingError("Failed to fetch account balance", error);
             }
         });
     }
-    viewAccountTokens(accountAddress, ticketType) {
+    createCollection(creator, collectionInfo) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const tokens = yield this.aptos.getAccountOwnedTokens({ accountAddress });
+                const createCollectionTxn = yield this.aptos.createCollectionTransaction({
+                    creator,
+                    description: collectionInfo.description,
+                    name: collectionInfo.name,
+                    uri: collectionInfo.uri,
+                });
+                yield this.submitTransactionWithRetry(creator, createCollectionTxn);
+                console.log("🎨 Collection created successfully!");
+            }
+            catch (error) {
+                throw new TicketingError("Failed to create collection", error);
+            }
+        });
+    }
+    mintTicketNFT(creator, collectionName, ticketName, ticketURI, totalTickets, ticketType, royaltyAddress) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const royaltyAccountAddress = this.ensureAccountAddress(royaltyAddress);
+                console.log(`✅ Starting to mint ${totalTickets} ${ticketType} ticket NFTs...`);
+                for (let i = 0; i < totalTickets; i++) {
+                    console.log(`Minting ticket ${i + 1} of ${totalTickets}...`);
+                    const mintTicketTxn = yield this.aptos.mintDigitalAssetTransaction({
+                        creator,
+                        collection: collectionName,
+                        description: ticketType,
+                        name: `${ticketName} #${i + 1}`,
+                        uri: ticketURI,
+                        // royaltyPayeeAddress: royaltyAccountAddress,
+                        // royaltyPointsDenominator: 100,
+                        // royaltyPointsNumerator: CONFIG.ROYALTY_PERCENTAGE,
+                    });
+                    yield this.submitTransactionWithRetry(creator, mintTicketTxn);
+                    if (i < totalTickets - 1) {
+                        yield new Promise((resolve) => setTimeout(resolve, CONFIG.MINT_DELAY));
+                    }
+                }
+                console.log(`🎟 All ${totalTickets} Ticket NFTs minted successfully!`);
+            }
+            catch (error) {
+                throw new TicketingError("Failed to mint ticket NFTs", error);
+            }
+        });
+    }
+    viewAccountTokens(address, ticketType) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const accountAddress = this.ensureAccountAddress(address);
+                const tokens = yield this.aptos.getAccountOwnedTokens({
+                    accountAddress: accountAddress.toString()
+                });
                 if (tokens.length > 0) {
                     const firstMatchingToken = tokens.find((token) => { var _a; return ((_a = token.current_token_data) === null || _a === void 0 ? void 0 : _a.description) === ticketType; });
                     if (firstMatchingToken) {
@@ -119,21 +191,22 @@ class TicketingSystem {
         });
     }
     buyTicket(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ buyerAddress, sellerAddress, ticketType }) {
+        return __awaiter(this, arguments, void 0, function* ({ buyerAddress, sellerAccount, ticketType }) {
             try {
+                const buyerAccountAddress = this.ensureAccountAddress(buyerAddress);
                 const price = CONFIG.TICKET_PRICES[ticketType];
                 if (!price) {
                     throw new TicketingError(`Invalid ticket type: ${ticketType}`);
                 }
-                console.log(`🛒 ${buyerAddress} is buying a ${ticketType} ticket from ${sellerAddress} for ${price / 100000000} APT`);
+                console.log(`🛒 ${buyerAccountAddress.toString()} is buying a ${ticketType} ticket from ${sellerAccount.accountAddress.toString()} for ${price / 100000000} APT`);
                 const buyerBalance = yield this.aptos.getAccountAPTAmount({
-                    accountAddress: buyerAddress,
+                    accountAddress: buyerAccountAddress.toString(),
                 });
                 if (buyerBalance < price) {
                     throw new InsufficientFundsError();
                 }
                 const sellerTickets = yield this.aptos.getOwnedDigitalAssets({
-                    ownerAddress: sellerAddress,
+                    ownerAddress: sellerAccount.accountAddress.toString(),
                 });
                 if (!sellerTickets.length) {
                     throw new NoTicketsAvailableError();
@@ -143,17 +216,23 @@ class TicketingSystem {
                     throw new NoTicketsAvailableError(`No ${ticketType} tickets available`);
                 }
                 const tokenDataId = firstMatchingToken.token_data_id;
-                // Execute payment transaction
-                const paymentTxn = yield this.aptos.transaction.build.simple({
-                    sender: buyerAddress,
-                    data: {
-                        function: "0x1::aptos_account::transfer",
-                        functionArguments: [sellerAddress, price],
-                    },
+                // Payment transaction
+                // const paymentTxn = await this.aptos.transaction.build.simple({
+                //     sender: buyerAccountAddress.toString(),
+                //     data: {
+                //         function: "0x1::aptos_account::transfer",
+                //         functionArguments: [sellerAccount.accountAddress, price],
+                //     },
+                // });
+                // await this.submitTransactionWithRetry(sellerAccount, paymentTxn);
+                // Transfer ticket transaction
+                const transferTicketTxn = yield this.aptos.transferDigitalAssetTransaction({
+                    sender: sellerAccount,
+                    digitalAssetAddress: tokenDataId,
+                    recipient: buyerAccountAddress,
                 });
-                // Note: You'll need to implement the actual transaction signing here
-                // This will require the private keys of the accounts
-                console.log(`🎟 ${ticketType} ticket successfully transferred to ${buyerAddress}`);
+                yield this.submitTransactionWithRetry(sellerAccount, transferTicketTxn);
+                console.log(`🎟 ${ticketType} ticket successfully transferred to ${buyerAccountAddress.toString()}`);
             }
             catch (error) {
                 if (error instanceof TicketingError) {
@@ -164,8 +243,10 @@ class TicketingSystem {
         });
     }
     resellTicket(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ sellerAddress, buyerAddress, resalePrice, organizerAddress, ticketType, }) {
+        return __awaiter(this, arguments, void 0, function* ({ sellerAccount, buyerAddress, resalePrice, organizerAddress, ticketType, }) {
             try {
+                const buyerAccountAddress = this.ensureAccountAddress(buyerAddress);
+                const organizerAccountAddress = this.ensureAccountAddress(organizerAddress);
                 const maxResalePrice = CONFIG.MAX_RESALE_PRICES[ticketType];
                 if (!maxResalePrice) {
                     throw new TicketingError(`Invalid ticket type: ${ticketType}`);
@@ -174,17 +255,23 @@ class TicketingSystem {
                     throw new TicketingError(`Resale price exceeds maximum allowed for ${ticketType}: ${maxResalePrice / 100000000} APT`);
                 }
                 const royaltyAmount = Math.floor((resalePrice * CONFIG.ROYALTY_PERCENTAGE) / 100);
-                const sellerAmount = resalePrice - royaltyAmount;
-                console.log(`🔄 ${sellerAddress} is reselling a ${ticketType} ticket to ${buyerAddress} for ${resalePrice / 100000000} APT with ${CONFIG.ROYALTY_PERCENTAGE}% royalty`);
-                // Execute main sale
+                console.log(`🔄 ${sellerAccount.accountAddress.toString()} is reselling a ${ticketType} ticket to ${buyerAccountAddress.toString()} for ${resalePrice / 100000000} APT with ${CONFIG.ROYALTY_PERCENTAGE}% royalty`);
+                // Execute ticket transfer with royalty payment
                 yield this.buyTicket({
-                    buyerAddress,
-                    sellerAddress,
+                    buyerAddress: buyerAccountAddress,
+                    sellerAccount,
                     ticketType,
                 });
-                // Note: You'll need to implement the actual transaction signing here
-                // This will require the private keys of the accounts
-                console.log(`✅ Royalty of ${royaltyAmount / 100000000} APT paid to Organizer`);
+                // Process royalty payment to organizer
+                const royaltyTxn = yield this.aptos.transaction.build.simple({
+                    sender: buyerAccountAddress.toString(),
+                    data: {
+                        function: "0x1::aptos_account::transfer",
+                        functionArguments: [organizerAccountAddress, royaltyAmount],
+                    },
+                });
+                yield this.submitTransactionWithRetry(sellerAccount, royaltyTxn);
+                console.log(`✅ ${ticketType} ticket resold successfully with ${royaltyAmount / 100000000} APT royalty to ${organizerAccountAddress.toString()}`);
             }
             catch (error) {
                 throw new TicketingError("Failed to complete ticket resale", error);
@@ -199,41 +286,84 @@ function main() {
             console.log("🎟 Starting NFT Ticketing System");
             console.log("================================");
             const ticketing = new TicketingSystem();
-            // Initialize account info
-            const accounts = [
-                { name: "Organizer", address: CONFIG.ADDRESSES.ORGANIZER },
-                { name: "User 1", address: CONFIG.ADDRESSES.USER1 },
-                { name: "User 2", address: CONFIG.ADDRESSES.USER2 },
-            ];
+            // Initialize backend account
+            const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+            const backend = Account.fromPrivateKey({ privateKey: backendPrivateKey });
+            // Set up addresses
+            const ORGANIZER_ADDRESS = AccountAddress.fromString("0xa53709fb9b81a068f5c4868c62c2513463411995184fb00a7e3c6166b58c9cd1");
+            const USER1_ADDRESS = AccountAddress.fromString("0xb5f96a6656d1b7353ea188666db490bdd9091ae7a987a75432e8c742c1995253");
+            const USER2_ADDRESS = AccountAddress.fromString("0x3e6d013285fe67aec5b7c757498378f31f1b188ff1796488baf0a1e88640edf0");
             // Print initial balances
-            yield ticketing.printBalances(accounts);
-            // Example of buying a ticket
+            console.log("\nInitial Balances:");
+            yield ticketing.printBalance(backend.accountAddress, "Backend");
+            yield ticketing.printBalance(ORGANIZER_ADDRESS, "Organizer");
+            yield ticketing.printBalance(USER1_ADDRESS, "User 1");
+            yield ticketing.printBalance(USER2_ADDRESS, "User 2");
+            // Create collection
+            console.log("\nCreating Ticket Collection");
+            const collectionInfo = {
+                name: "Concert Tickets5", // make sure it is unique and not already created
+                uri: "https://example.com/tickets",
+                description: "Exclusive event tickets.",
+            };
+            yield ticketing.createCollection(backend, collectionInfo);
+            // Mint VIP tickets with royalty to organizer
+            console.log("\nMinting VIP Tickets");
+            yield ticketing.mintTicketNFT(backend, collectionInfo.name, "VIP Ticket", "https://example.com/vip-ticket", 2, "VIP", ORGANIZER_ADDRESS);
+            // Mint normal tickets with royalty to organizer
+            // console.log("\nMinting Normal Tickets");
+            // await ticketing.mintTicketNFT(
+            //     backend,
+            //     collectionInfo.name,
+            //     "Normal Ticket",
+            //     "https://example.com/normal-ticket",
+            //     2,
+            //     "NORMAL",
+            //     ORGANIZER_ADDRESS
+            // );
+            // Sell tickets to users
+            console.log("\nSelling tickets to users");
+            // Sell VIP ticket to User 1
             yield ticketing.buyTicket({
-                buyerAddress: CONFIG.ADDRESSES.USER1,
-                sellerAddress: CONFIG.ADDRESSES.ORGANIZER,
-                ticketType: "VIP",
+                buyerAddress: USER1_ADDRESS,
+                sellerAccount: backend,
+                ticketType: "VIP"
             });
-            // Example of reselling a ticket
-            // await ticketing.resellTicket({
-            //     sellerAddress: CONFIG.ADDRESSES.USER1,
-            //     buyerAddress: CONFIG.ADDRESSES.USER2,
-            //     resalePrice: 13_000_000,
-            //     organizerAddress: CONFIG.ADDRESSES.ORGANIZER,
-            //     ticketType: "VIP",
+            // Sell normal ticket to User 2
+            // await ticketing.buyTicket({
+            //     buyerAddress: USER2_ADDRESS,
+            //     sellerAccount: backend,
+            //     ticketType: "NORMAL"
             // });
+            // Demonstrate resale functionality
+            console.log("\nDemonstrating ticket resale");
+            // Convert User1 to account for resale
+            // const user1PrivateKey = new Ed25519PrivateKey("YOUR_USER1_PRIVATE_KEY"); // Replace with actual private key
+            // const user1Account = Account.fromPrivateKey({ privateKey: user1PrivateKey });
+            // // User 1 resells VIP ticket to User 2
+            // await ticketing.resellTicket({
+            //     sellerAccount: user1Account,
+            //     buyerAddress: USER2_ADDRESS,
+            //     resalePrice: CONFIG.MAX_RESALE_PRICES.VIP,
+            //     organizerAddress: ORGANIZER_ADDRESS,
+            //     ticketType: "VIP"
+            // });
+            // View tokens for each account
+            console.log("\nViewing final token distribution:");
+            yield ticketing.viewAccountTokens(backend.accountAddress, "VIP");
+            yield ticketing.viewAccountTokens(backend.accountAddress, "NORMAL");
+            yield ticketing.viewAccountTokens(USER1_ADDRESS, "VIP");
+            // await ticketing.viewAccountTokens(USER2_ADDRESS, "NORMAL");
+            // Print final balances
             console.log("\nFinal Balances:");
-            yield ticketing.printBalances(accounts);
+            yield ticketing.printBalance(backend.accountAddress, "Backend");
+            // await ticketing.printBalance(ORGANIZER_ADDRESS, "Organizer");
+            // await ticketing.printBalance(USER1_ADDRESS, "User 1");
+            // await ticketing.printBalance(USER2_ADDRESS, "User 2");
+            console.log("\n✅ NFT Ticketing System operations completed successfully");
         }
         catch (error) {
-            if (error instanceof TicketingError) {
-                console.error("\n❌ Ticketing system error:", error.message);
-                if (error.cause) {
-                    console.error("Caused by:", error.cause);
-                }
-            }
-            else {
-                console.error("\n❌ Unexpected error:", error);
-            }
+            console.error("\n❌ Error:", error);
             process.exit(1);
         }
     });
