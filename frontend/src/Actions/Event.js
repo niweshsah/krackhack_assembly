@@ -19,20 +19,20 @@ export const getEvents =
                 });
             }
         };
-export const commentEvent = (event_id,comment) => async (dispatch) => {
+export const commentEvent = (event_id, comment) => async (dispatch) => {
     try {
         dispatch({
             type: "commentRequest",
         });
         const { data } = await axios.post(
             "/api/v1/event/review",
-            {event_id , comment },
+            { event_id, comment },
             {
-              headers: {
-                "Content-Type": "application/json",
-              },
+                headers: {
+                    "Content-Type": "application/json",
+                },
             }
-          );
+        );
         dispatch({
             type: "commentSuccess",
             payload: data.message,
@@ -44,7 +44,7 @@ export const commentEvent = (event_id,comment) => async (dispatch) => {
         });
     }
 };
-export const bookTicket = (event_id,category) => async (dispatch) => {
+export const bookTicket = (event_id, category) => async (dispatch) => {
     try {
         dispatch({
             type: "bookRequest",
@@ -52,13 +52,13 @@ export const bookTicket = (event_id,category) => async (dispatch) => {
         // const { data } = await axios.get(`/api/v1/post/${id}`);
         const { data } = await axios.post(
             "/api/v1/event/book_ticket",
-            {event_id,category},
+            { event_id, category },
             {
-              headers: {
-                "Content-Type": "application/json",
-              },
+                headers: {
+                    "Content-Type": "application/json",
+                },
             }
-          );
+        );
         dispatch({
             type: "bookSuccess",
             payload: data.message,
@@ -71,7 +71,7 @@ export const bookTicket = (event_id,category) => async (dispatch) => {
     }
 };
 
-export const createNewEvent = (image, title, Date_and_Time, tickets) => async (dispatch) => {
+export const createNewEvent = (image, title, date, time, venue, organiser, tickets, token) => async (dispatch) => {
     try {
         dispatch({
             type: "newEventRequest",
@@ -79,13 +79,13 @@ export const createNewEvent = (image, title, Date_and_Time, tickets) => async (d
         // const { data } = await axios.get(`/api/v1/post/${id}`);
         const { data } = await axios.post(
             "http://localhost:5000/api/v1/event/create",
-            {image, title, Date_and_Time, tickets},
+            { image, title, date, time, venue, organiser, tickets, token },
             {
-              headers: {
-                "Content-Type": "application/json",
-              },
+                headers: {
+                    "Content-Type": "application/json",
+                },
             }
-          );
+        );
         dispatch({
             type: "newEventSuccess",
             payload: {

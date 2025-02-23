@@ -7,7 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Account, Aptos, AptosConfig, Network, } from "@aptos-labs/ts-sdk";
+import { Account, Aptos, AptosConfig, Network, Ed25519PrivateKey, } from "@aptos-labs/ts-sdk";
+// import {  } from "aptos";
 // =============== Constants ===============
 const CONFIG = {
     INITIAL_BALANCE: 100000000, // 1 APT
@@ -226,6 +227,7 @@ export class TicketingSystem {
                 }
                 const royaltyAmount = Math.floor((resalePrice * CONFIG.ROYALTY_PERCENTAGE) / 100);
                 const sellerAmount = resalePrice - royaltyAmount;
+                console.log('\n seller address type:', typeof seller.accountAddress);
                 console.log(`🔄 ${seller.accountAddress} is reselling a ${ticketType} ticket to ${buyer.accountAddress} for ${resalePrice / 100000000} APT with ${CONFIG.ROYALTY_PERCENTAGE}% royalty`);
                 // Execute main sale
                 yield this.buyTicket({
@@ -298,21 +300,20 @@ function main() {
             // Initialize accounts
             console.log("\n1. Creating Accounts");
             console.log("-------------------");
-            const organizer = Account.generate();
+            //   const organizer = Account.generate();
             const users = [Account.generate(), Account.generate()];
-            yield ticketing.initializeAccounts(organizer, users);
+            const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+            const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
+            //   await ticketing.initializeAccounts(organizer, users);
             // Print initial balances
             const accounts = [
                 { name: "Organizer", account: organizer },
                 ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
             ];
-            console.log("\n organizer: ", organizer);
-
-            const walletAddress = "0x18cab2e30ce3501a2ccb..." // Your Aptos wallet address
-            const accountAddress = AccountAddress.fromHex(walletAddress);
-
-            console.log
             yield ticketing.printBalances(accounts);
+            console.log('\n Organiser Account Address:', organizer.accountAddress);
+            //   console.log('\n account type: ', typeof organizer);
+            console.log('\n organiser:', organizer);
             // Create collection
             console.log("\n2. Creating Ticket Collection");
             console.log("--------------------------");
@@ -321,8 +322,6 @@ function main() {
                 uri: "https://example.com/tickets",
                 description: "Exclusive event tickets.",
             };
-            console.log('\norganizer type: ',typeof organizer.accountAddress );
-            console.log('\norganizer: ', organizer.accountAddress.data);
             yield ticketing.createCollection(organizer, collectionInfo);
             // Mint VIP tickets
             console.log("\n3.a Minting VIP Tickets");
@@ -374,8 +373,6 @@ function main() {
         }
     });
 }
-
-
 // Run the system
 main().catch((error) => {
     console.error("Fatal error:", error);

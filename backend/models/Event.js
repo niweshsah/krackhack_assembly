@@ -3,33 +3,25 @@ const mongoose = require("mongoose");
 const eventSchema = new mongoose.Schema({
     // Category : String,
     Title : String,
-    image : {
-        public_id : String,
-        url : String
-    },
-    organiser : 
-    {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : "User"
-    },
-    Date_and_Time : 
-    {
-        date : String,
-        time : String
-    },
+    artist : String,
+    image : String,
+    organiser : String,
+    date : String,
+    time : String,
+    venue : String,
     attendees : [
         {
             user : {
                 type : mongoose.Schema.Types.ObjectId,
                 ref : "User",
             },
-            category : Number,
+            category : String,
         },
     ],
     tickets : [
         {
-            category : Number,
-            price : String,
+            category : String,
+            price : Number,
             desc : String,
             seats_available : Number
         }
@@ -43,7 +35,6 @@ const eventSchema = new mongoose.Schema({
             },
         }
     ],
-
     isFinish : Boolean
 });
 module.exports = mongoose.model("Event",eventSchema);

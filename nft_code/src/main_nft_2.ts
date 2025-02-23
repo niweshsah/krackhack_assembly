@@ -38,7 +38,7 @@ interface AccountInfo {
 }
 
 interface BuyTicketParams {
-  buyer: Ed25519Account;
+  buyerAddress: AccountAddress;
   seller: Ed25519Account;
   ticketType: string;
 }
@@ -221,7 +221,7 @@ class TicketingSystem {
       }
   }
 
-  async buyTicket({ buyer, seller, ticketType }: BuyTicketParams): Promise<void> {
+  async buyTicket({ buyerAddress, seller, ticketType }: BuyTicketParams): Promise<void> {
       try {
           const price = CONFIG.TICKET_PRICES[ticketType as keyof typeof CONFIG.TICKET_PRICES];
           if (!price) {
@@ -229,12 +229,12 @@ class TicketingSystem {
           }
 
           console.log(
-              `🛒 ${buyer.accountAddress} is buying a ${ticketType} ticket from ${seller.accountAddress
+              `🛒 ${buyerAddress} is buying a ${ticketType} ticket from ${seller.accountAddress
               } for ${price / 100_000_000} APT`
           );
 
           const buyerBalance = await this.aptos.getAccountAPTAmount({
-              accountAddress: buyer.accountAddress,
+              accountAddress: buyerAddress,
           });
 
           if (buyerBalance < price) {
@@ -276,13 +276,13 @@ class TicketingSystem {
           const transferTicketTxn = await this.aptos.transferDigitalAssetTransaction({
               sender: seller,
               digitalAssetAddress: tokenDataId,
-              recipient: buyer.accountAddress,
+              recipient: buyerAddress,
           });
 
           await this.submitTransactionWithRetry(seller, transferTicketTxn);
 
           console.log(
-              `🎟 ${ticketType} ticket successfully transferred to ${buyer.accountAddress}`
+              `🎟 ${ticketType} ticket successfully transferred to ${buyerAddress}`
           );
 
 
@@ -328,7 +328,7 @@ class TicketingSystem {
 
           // Execute main sale
           await this.buyTicket({
-              buyer,
+              buyerAddress: buyer.accountAddress,
               seller,
               ticketType,
           });
@@ -427,7 +427,6 @@ async function main() {
         // gaurav secret key
         const user1 = Account.fromPrivateKey({ privateKey: user1key });
 
-        user1.accountAddress
 
         const users = [user1];
 
@@ -487,7 +486,7 @@ async function main() {
       console.log("\n4. Initial Ticket Sales");
       console.log("---------------------");
       await ticketing.buyTicket({
-          buyer: users[0],
+          buyerAddress: users[0].accountAddress,
           seller: organizer,
           ticketType: "VIP",
       });

@@ -17,7 +17,7 @@ import {
       .map(byte => parseInt(byte, 16))
   );
 
-  
+
   
   const ALICE_INITIAL_BALANCE = 100_000_000;
   const BOB_INITIAL_BALANCE = 0;
@@ -33,6 +33,8 @@ import {
   // Create Alice's account from a private key
   const alicePrivateKey = new Ed25519PrivateKey(alicePrivateKeyBytes);
   const alice = Account.fromPrivateKey({ privateKey: alicePrivateKey });
+  
+
   
   // Create Bob's account
   const bob = Account.generate();

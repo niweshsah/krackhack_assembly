@@ -92,7 +92,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 //     //   throw new Error("Alice's balance after transfer is incorrect");
 //   };
 //   example();
-import { AccountAddress, Aptos, AptosConfig, Network, } from "@aptos-labs/ts-sdk";
+import { Account, Aptos, AptosConfig, Network, Ed25519PrivateKey, } from "@aptos-labs/ts-sdk";
 // Alice's address 
 const ALICE_ADDRESS_HEX = "0xa53709fb9b81a068f5c4868c62c2513463411995184fb00a7e3c6166b58c9cd1";
 // const ALICE_ADDRESS_HEX = "0xb5f96a6656d1b7353ea188666db490bdd9091ae7a987a75432e8c742c1995253";
@@ -105,11 +105,13 @@ const checkAssets = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log("Fetching assets for Alice...");
         // Convert address from string to AccountAddress
-        const aliceAddress = AccountAddress.fromString(ALICE_ADDRESS_HEX);
-        console.log("address: ", aliceAddress);
+        // const aliceAddress = AccountAddress.fromString(ALICE_ADDRESS_HEX);
+        const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+        const backend = Account.fromPrivateKey({ privateKey: backendPrivateKey });
+        console.log("address: ", backend.accountAddress);
         // Fetch Alice's digital assets
         const sellerTickets = yield aptos.getOwnedDigitalAssets({
-            ownerAddress: aliceAddress,
+            ownerAddress: backend.accountAddress,
         });
         console.log("seller: ", sellerTickets);
         console.log(`Alice owns ${sellerTickets.length} assets.`);
