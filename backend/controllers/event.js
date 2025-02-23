@@ -1,7 +1,6 @@
 const cloudinary = require("cloudinary").v2;
 const Event = require('../models/Event'); // Assuming you have a Debate model
 const User = require('../models/User'); // Assuming you have a User model/
-const ticketingSystem = 
 
 // Configure Cloudinary
 cloudinary.config({
@@ -12,79 +11,78 @@ cloudinary.config({
 
 exports.createEvent = async (req, res) => {
   try {
-    console.log("bye")
-    const { image, title, Date_and_Time, tickets } = req.body;
-
+    // console.log("bye")
+    // const { image, title, date , time, venue, tickets , organiser } = req.body;
     // Validate required fields
-    if (!image || !title || !Date_and_Time || !Array.isArray(tickets) || tickets.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Image, title, date/time, and at least one ticket category are required",
-      });
-    }
-
+    // console.log(title , date , time , venue , organiser)
+    // if (!image || !title || !date || !time || !venue || !Array.isArray(tickets) || tickets.length === 0) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Image, title, date/time, and at least one ticket category are required",
+    //   });
+    // }
+    const {title,tickets,date,time,venue,organiser} = req.body;
+    const event = await Event.create({title,tickets,date,time,venue,organiser});
     // Validate each ticket category
-    for (const ticket of tickets) {
-      if (
+    // for (const ticket of tickets) {
+    //   if (
 
-        typeof ticket.category !== "number" ||
-        typeof ticket.price !== "string" ||
-        typeof ticket.desc !== "string" ||
-        typeof ticket.seats_available !== "number"
+    //     typeof ticket.category !== "string" ||
+    //     typeof ticket.price !== "number" ||
+    //     typeof ticket.desc !== "string" ||
+    //     typeof ticket.seats_available !== "number"
 
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: "Each ticket must have a valid category (Number), price (String), description (String), and seats_available (Number)",
-        });
-      }
+    //   ) {
+    //     return res.status(400).json({
+    //       success: false,
+    //       message: "Each ticket must have a valid category (Number), price (String), description (String), and seats_available (Number)",
+    //     });
+    //   }
 
-      if (ticket.seats_available <= 0) {
-        return res.status(400).json({
-          success: false,
-          message: `Seats available for category ${ticket.category} must be at least 1`,
-        });
-      }
-    }
+    //   if (ticket.seats_available <= 0) {
+    //     return res.status(400).json({
+    //       success: false,
+    //       message: `Seats available for category ${ticket.category} must be at least 1`,
+    //     });
+    //   }
+    // }
 
     // Upload image to Cloudinary
-    const myCloud = await cloudinary.uploader.upload(image, {
-      folder: "debates",
-    });
+    // const myCloud = await cloudinary.uploader.upload(image, {
+    //   folder: "debates",
+    // });
 
     // Prepare event data
-    const newEventData = {
-      Title: title,
-      Date_and_Time,
-      image: {
-        public_id: myCloud.public_id,
-        url: myCloud.secure_url,
-      },
-      organiser: "67b98b04f6cdb3024c18ba96",
-      isFinish: false,
-      tickets, // Store ticket details in the event
-    };
+    // const newEventData = {
+    //   title: title,
+    //   date ,
+    //   time,
+    //   venue,
+    //   organiser,
+    //   isFinish: false,
+    //   tickets, // Store ticket details in the event
+    // };
 
     // Create event in the database
-    const event = await Event.create(newEventData);
+    // const event = await Event.create({title,date,image,time,venue,organiser,tickets});
 
     // Find the organiser
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+    // const user = await User.findById(req.user._id);
+    // if (!user) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "User not found",
+    //   });
+    // }
 
     // Add event to user's organised events
-    if (!user.events_organised) {
-      user.events_organised = [];
-    }
-    user.events_organised.push(event._id);
+    // if (!user.events_organised) {
+    //   user.events_organised = [];
+    // }
+    // user.events_organised.push(event._id);
 
-    await user.save();
-    await event.save();
+    // await user.save();
+    // await event.save();
 
     // Respond with success
     res.status(201).json({
@@ -172,7 +170,7 @@ exports.resale = async(req,res) => {
 exports.book_ticket = async (req, res) => {
   try {
     const { event_id, category } = req.body; // Extract event ID and category from request body
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.body._id);
     const event = await Event.findById(event_id);
 
     // Check if event and user exist

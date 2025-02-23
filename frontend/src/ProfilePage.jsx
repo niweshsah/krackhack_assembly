@@ -1,18 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, Clock, MapPin, Wallet, Copy, Ticket, User, Star } from 'lucide-react';
-
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { loadUser } from './Actions/User';
 const ProfileDashboard = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
-  
+  const dispatch = useDispatch();
   // Sample data - replace with actual data from blockchain/backend
+  
+  // useEffect(() => {
+  //   dispatch(loadUser());
+  // }, [dispatch]);
+  
+  const { user } = useSelector((state) => state.user);
   const userProfile = {
-    name: "Alex Thompson",
+    name: user.name,
     age: 28,
     walletAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    totalEventsOrganized: 12,
-    totalTicketsPurchased: 8,
+    totalEventsOrganized: user.events_organised.length,
+    totalTicketsPurchased: user.events_attended.length,
   };
-
+  useEffect(() => {
+    if (user) {
+      console.log('User:', user);
+    }
+    else {
+      console.log("User Does not exist");
+    }
+  }, [user]);
+  // const upcomingTickets = loop 
   const upcomingTickets = [
     {
       id: 1,
@@ -35,7 +51,7 @@ const ProfileDashboard = () => {
       price: 120,
     }
   ];
-
+  
   const organizedEvents = [
     {
       id: 1,

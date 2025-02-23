@@ -10,22 +10,25 @@ import SignInWindow from './SignIn';
 import SignUpWindow from './SignUp';
 import { useSelector } from 'react-redux';
 function App() {
-  const {isAuthenticated} = useSelector((state) => state.user)
+  const { isAuthenticated } = useSelector((state) => state.user)
   return (
     <Router>
-      
       <div className="flex flex-col min-h-screen">
-        
-        <Header isSignedIn = {isAuthenticated}/>
+        <Header isSignedIn={isAuthenticated} />
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/signin" element={<SignInWindow />} />
-            {/* <Route path="/signup" element={<SignInWindow />} /> */}
-            <Route path="/signup" element={isAuthenticated ? <ProfileDashboard /> : <SignUpWindow/>} />
-            <Route path="/profile" element={<ProfileDashboard />} />
             <Route path="/event" element={<EventListing />} />
-            <Route path="/organize" element={<EventCreationForm />} />
+            <Route path="/signin" element={isAuthenticated ? <HomePage /> : <SignInWindow />} />
+            <Route path="/signup" element={isAuthenticated ? <HomePage /> : <SignUpWindow />} />
+            <Route
+              path="/profile"
+              element={isAuthenticated ? <ProfileDashboard /> : <SignUpWindow />}
+            />
+            <Route
+              path="/organize"
+              element={isAuthenticated ? <EventCreationForm /> : <SignUpWindow />}
+            />
           </Routes>
         </div>
         <Footer />

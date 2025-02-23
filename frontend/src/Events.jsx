@@ -178,7 +178,7 @@
 //               />
 //               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50" />
 //             </div>
-            
+
 //             <div>
 //               <select className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-pink-500">
 //                 <option value="">Select Category</option>
@@ -187,14 +187,14 @@
 //                 <option value="jazz">Jazz</option>
 //               </select>
 //             </div>
-            
+
 //             <div>
 //               <input
 //                 type="date"
 //                 className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-pink-500"
 //               />
 //             </div>
-            
+
 //             <button className="px-6 py-3 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-all duration-300 flex items-center justify-center space-x-2">
 //               <Filter className="w-5 h-5" />
 //               <span>Filter Results</span>
@@ -253,15 +253,16 @@ const EventListing = () => {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 bg-pink-500 text-white px-3 py-1 rounded-full text-sm">
-          ${event.tickets[0].price}
+          ${event.tickets?.length > 0 ? event.tickets[0].price : 0}
         </div>
+
       </div>
       <div className="p-6">
         <h3 className="text-xl font-bold text-white mb-2">{event.title}</h3>
         <div className="space-y-2 mb-4">
           <div className="flex items-center text-gray-300">
             <Calendar className="w-4 h-4 mr-2 text-pink-500" />
-            {event.Date_and_Time.date} at {event.Date_and_Time.time}
+            {event.date} at {event.time} in {event.venue}
           </div>
         </div>
         <button

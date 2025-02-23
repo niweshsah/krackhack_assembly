@@ -26,12 +26,14 @@ const Header = ({ isSignedIn = false }) => {
         </Link>
       );
     }
-    return (
-      <Link to="/signin" className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
+    else {
+      return (
+      <Link to="/signup" className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
         <User className="w-5 h-5 text-white" />
         <span className="text-white">Sign Up</span>
       </Link>
     );
+  }
   };
 
   // Mobile menu profile button
