@@ -226,6 +226,9 @@ To execute the contract, follow these steps:
 
     - Added tooltips and guides for non-crypto users.
       
+<<<<<<< HEAD
 
 ## Our LOOM video link:
 [Video Link](https://www.loom.com/share/2374c7c8bc7e4031ae2d32c1a4d41f0a?sid=f680aa31-6168-4ea8-8213-5fcc212cd4dd)
+=======
+>>>>>>> aa2d933d742eafa8213ac1e0f41ffd1864346da2
