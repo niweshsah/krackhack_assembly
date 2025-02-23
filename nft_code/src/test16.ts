@@ -180,10 +180,10 @@ class TicketingSystem {
         ticketURI: string,
         totalTickets: number,
         ticketType: string,
-        royaltyAddress: AccountAddress | string
+        // royaltyAddress: AccountAddress | string
     ): Promise<void> {
         try {
-            const royaltyAccountAddress = this.ensureAccountAddress(royaltyAddress);
+            // const royaltyAccountAddress = this.ensureAccountAddress(royaltyAddress);
             console.log(`✅ Starting to mint ${totalTickets} ${ticketType} ticket NFTs...`);
 
             for (let i = 0; i < totalTickets; i++) {
@@ -394,11 +394,13 @@ async function main() {
 
         // Create collection
         console.log("\nCreating Ticket Collection");
+
         const collectionInfo = {
             name: "Concert Tickets5", // make sure it is unique and not already created
             uri: "https://example.com/tickets",
             description: "Exclusive event tickets.",
         };
+
         await ticketing.createCollection(backend, collectionInfo);
 
         // Mint VIP tickets with royalty to organizer
@@ -410,7 +412,7 @@ async function main() {
             "https://example.com/vip-ticket",
             2,
             "VIP",
-            ORGANIZER_ADDRESS
+            // ORGANIZER_ADDRESS
         );
 
         // Mint normal tickets with royalty to organizer

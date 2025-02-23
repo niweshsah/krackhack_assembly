@@ -137,10 +137,10 @@ class TicketingSystem {
             }
         });
     }
-    mintTicketNFT(creator, collectionName, ticketName, ticketURI, totalTickets, ticketType, royaltyAddress) {
+    mintTicketNFT(creator, collectionName, ticketName, ticketURI, totalTickets, ticketType) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const royaltyAccountAddress = this.ensureAccountAddress(royaltyAddress);
+                // const royaltyAccountAddress = this.ensureAccountAddress(royaltyAddress);
                 console.log(`✅ Starting to mint ${totalTickets} ${ticketType} ticket NFTs...`);
                 for (let i = 0; i < totalTickets; i++) {
                     console.log(`Minting ticket ${i + 1} of ${totalTickets}...`);
@@ -309,7 +309,7 @@ function main() {
             yield ticketing.createCollection(backend, collectionInfo);
             // Mint VIP tickets with royalty to organizer
             console.log("\nMinting VIP Tickets");
-            yield ticketing.mintTicketNFT(backend, collectionInfo.name, "VIP Ticket", "https://example.com/vip-ticket", 2, "VIP", ORGANIZER_ADDRESS);
+            yield ticketing.mintTicketNFT(backend, collectionInfo.name, "VIP Ticket", "https://example.com/vip-ticket", 2, "VIP");
             // Mint normal tickets with royalty to organizer
             // console.log("\nMinting Normal Tickets");
             // await ticketing.mintTicketNFT(

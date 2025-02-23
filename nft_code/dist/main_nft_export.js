@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Account, Aptos, AptosConfig, Network, } from "@aptos-labs/ts-sdk";
+// import {  } from "aptos";
 // =============== Constants ===============
 const CONFIG = {
     INITIAL_BALANCE: 100000000, // 1 APT
@@ -226,6 +227,7 @@ export class TicketingSystem {
                 }
                 const royaltyAmount = Math.floor((resalePrice * CONFIG.ROYALTY_PERCENTAGE) / 100);
                 const sellerAmount = resalePrice - royaltyAmount;
+                console.log('\n seller address type:', typeof seller.accountAddress);
                 console.log(`🔄 ${seller.accountAddress} is reselling a ${ticketType} ticket to ${buyer.accountAddress} for ${resalePrice / 100000000} APT with ${CONFIG.ROYALTY_PERCENTAGE}% royalty`);
                 // Execute main sale
                 yield this.buyTicket({
@@ -306,13 +308,10 @@ function main() {
                 { name: "Organizer", account: organizer },
                 ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
             ];
-            console.log("\n organizer: ", organizer);
-
-            const walletAddress = "0x18cab2e30ce3501a2ccb..." // Your Aptos wallet address
-            const accountAddress = AccountAddress.fromHex(walletAddress);
-
-            console.log
             yield ticketing.printBalances(accounts);
+            console.log('\n Organiser Account Address:', organizer.accountAddress);
+            //   console.log('\n account type: ', typeof organizer);
+            console.log('\n organiser:', organizer);
             // Create collection
             console.log("\n2. Creating Ticket Collection");
             console.log("--------------------------");
@@ -321,8 +320,6 @@ function main() {
                 uri: "https://example.com/tickets",
                 description: "Exclusive event tickets.",
             };
-            console.log('\norganizer type: ',typeof organizer.accountAddress );
-            console.log('\norganizer: ', organizer.accountAddress.data);
             yield ticketing.createCollection(organizer, collectionInfo);
             // Mint VIP tickets
             console.log("\n3.a Minting VIP Tickets");
@@ -374,8 +371,6 @@ function main() {
         }
     });
 }
-
-
 // Run the system
 main().catch((error) => {
     console.error("Fatal error:", error);
