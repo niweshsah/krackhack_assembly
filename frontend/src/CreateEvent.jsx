@@ -44,25 +44,57 @@ const EventCreationForm = () => {
     setTickets(tickets.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   dispatch(createNewEvent(eventData.image, eventData.title, eventData.Date_and_Time, tickets))
+  //   const ticketing = new TicketingSystem();
+
+  //   console.log("\n2. Creating Ticket Collection");
+  //   console.log("--------------------------");
+  //   const collectionInfo = {
+  //     name: eventData.title,
+  //     uri: "https://example.com/tickets-in-frontend",
+  //     description: eventData.Date_and_Time,
+  //   };
+
+  //   yield ticketing.createCollection(organizer, collectionInfo);
+
+
+
+  //   console.log('Event Data:', eventData);
+  //   console.log('Tickets:', tickets);
+  // };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(createNewEvent(eventData.image, eventData.title, eventData.Date_and_Time, tickets))
-    const ticketing = new TicketingSystem();
-
-    console.log("\n2. Creating Ticket Collection");
-    console.log("--------------------------");
-    const collectionInfo = {
-      name: eventData.title,
-      uri: "https://example.com/tickets-in-frontend",
-      description: eventData.Date_and_Time,
-    };
-    yield ticketing.createCollection(organizer, collectionInfo);
-
-
-
-    console.log('Event Data:', eventData);
-    console.log('Tickets:', tickets);
+    
+    // Dispatch Redux action to store event
+    dispatch(createNewEvent(eventData.image, eventData.title, eventData.Date_and_Time, tickets));
+  
+    try {
+      const ticketing = new TicketingSystem();
+  
+      console.log("\n2. Creating Ticket Collection");
+      console.log("--------------------------");
+  
+      const collectionInfo = {
+        name: eventData.title,
+        uri: "https://example.com/tickets-in-frontend",
+        description: `${eventData.Date_and_Time.date} ${eventData.Date_and_Time.time}`, // Ensure proper string format
+      };
+  
+      const organizer = "organizer_wallet_id"; // Replace with actual organizer wallet ID
+  
+      // Ensure the function is awaited
+      await ticketing.createCollection(organizer, collectionInfo);
+  
+      console.log('Event Data:', eventData);
+      console.log('Tickets:', tickets);
+    } catch (error) {
+      console.error("Error creating ticket collection:", error);
+    }
   };
+  
 
   return (
     <div className="min-h-screen bg-black p-8 pt-[82px]">
