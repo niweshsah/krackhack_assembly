@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Account, Aptos, AptosConfig, Network, } from "@aptos-labs/ts-sdk";
+// import {  } from "aptos";
 // =============== Constants ===============
 const CONFIG = {
     INITIAL_BALANCE: 100000000, // 1 APT
@@ -307,6 +308,8 @@ function main() {
                 ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
             ];
             yield ticketing.printBalances(accounts);
+            console.log(`organizer's address is: ${organizer.accountAddress}`);
+            console.log('organizer: ', organizer);
             // Create collection
             console.log("\n2. Creating Ticket Collection");
             console.log("--------------------------");
