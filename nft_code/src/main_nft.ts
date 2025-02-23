@@ -25,7 +25,7 @@ const CONFIG = {
       NORMAL: 8_000_000,  // 0.08 APT max resale for normal
   },
   ROYALTY_PERCENTAGE: 10, // 10%
-  NETWORK: Network.DEVNET,
+  NETWORK: Network.TESTNET,
   MAX_RETRIES: 3,
   RETRY_DELAY: 1000, // 1 second
   MINT_DELAY: 1000, // 1 second between mints
@@ -260,15 +260,17 @@ class TicketingSystem {
           const tokenDataId = firstMatchingToken.token_data_id;
 
           // Execute payment transaction
-          const paymentTxn = await this.aptos.transaction.build.simple({
-              sender: buyer.accountAddress,
-              data: {
-                  function: "0x1::aptos_account::transfer",
-                  functionArguments: [seller.accountAddress, price],
-              },
-          });
+        //   const paymentTxn = await this.aptos.transaction.build.simple({
+        //       sender: buyer.accountAddress,
+        //       data: {
+        //           function: "0x1::aptos_account::transfer",
+        //           functionArguments: [seller.accountAddress, price],
+        //       },
+        //   });
 
-          await this.submitTransactionWithRetry(buyer, paymentTxn);
+        //   await this.submitTransactionWithRetry(buyer, paymentTxn);
+
+        console.log('\n sahu will give payment code');
 
           // Transfer ticket
           const transferTicketTxn = await this.aptos.transferDigitalAssetTransaction({
@@ -282,6 +284,8 @@ class TicketingSystem {
           console.log(
               `🎟 ${ticketType} ticket successfully transferred to ${buyer.accountAddress}`
           );
+
+
       } catch (error) {
           if (error instanceof TicketingError) {
               throw error;
@@ -377,10 +381,10 @@ class TicketingSystem {
       try {
           console.log("🏦 Initializing accounts with initial balance...");
 
-          await this.aptos.fundAccount({
-              accountAddress: organizer.accountAddress,
-              amount: CONFIG.INITIAL_BALANCE,
-          });
+        //   await this.aptos.fundAccount({
+        //       accountAddress: organizer.accountAddress,
+        //       amount: CONFIG.INITIAL_BALANCE,
+        //   });
 
           for (const user of users) {
               await this.aptos.fundAccount({
@@ -410,11 +414,21 @@ async function main() {
 
       
     //   const organizer = Account.generate();
-      const users = [Account.generate(), Account.generate()];
+    //   const users = [Account.generate(), Account.generate()];
 
-      const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+    //   const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+    //     const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
+
+
+        const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
         const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
 
+        const user1key = new Ed25519PrivateKey("0x0d2942f0a8ab3d057e426b0f8bdcb3a639d359f91a56a1ee761c4169db06351e");
+        // gaurav secret key
+        const user1 = Account.fromPrivateKey({ privateKey: user1key });
+
+
+        const users = [user1];
 
     //   await ticketing.initializeAccounts(organizer, users);
 
@@ -437,10 +451,11 @@ async function main() {
       console.log("\n2. Creating Ticket Collection");
       console.log("--------------------------");
       const collectionInfo: CollectionInfo = {
-          name: "Concert Tickets",
+          name: "Concert Tickets10",
           uri: "https://example.com/tickets",
           description: "Exclusive event tickets.",
       };
+
       await ticketing.createCollection(organizer, collectionInfo);
 
       // Mint VIP tickets
@@ -475,25 +490,26 @@ async function main() {
           seller: organizer,
           ticketType: "VIP",
       });
-      await ticketing.buyTicket({
-          buyer: users[1],
-          seller: organizer,
-          ticketType: "NORMAL",
-      });
+
+    //   await ticketing.buyTicket({
+    //       buyer: users[1],
+    //       seller: organizer,
+    //       ticketType: "NORMAL",
+    //   });
 
       console.log("\nBalances after initial sales:");
       await ticketing.printBalances(accounts);
 
       // Resell ticket
-      console.log("\n5. Ticket Resale");
-      console.log("---------------");
-      await ticketing.resellTicket({
-          seller: users[0],
-          buyer: users[1],
-          resalePrice: 13_000_000, // Increased to be within VIP max resale price
-          organizer,
-          ticketType: "VIP",
-      });
+    //   console.log("\n5. Ticket Resale");
+    //   console.log("---------------");
+    //   await ticketing.resellTicket({
+    //       seller: users[0],
+    //       buyer: users[1],
+    //       resalePrice: 13_000_000, // Increased to be within VIP max resale price
+    //       organizer,
+    //       ticketType: "VIP",
+    //   });
 
       console.log("\nFinal Balances:");
       await ticketing.printBalances(accounts);
