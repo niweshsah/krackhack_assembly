@@ -4,7 +4,26 @@ import { useDispatch } from 'react-redux';
 import { createNewEvent } from './Actions/Event'
 // import TicketingSystem from '../../nft_code/dist/main_nft'
 import {TicketingSystem} from '../../nft_code/dist/main_nft_export'
-import { AccountAddress } from '@aptos-labs/ts-sdk';
+// import { AccountAddress } from '@aptos-labs/ts-sdk';
+
+function hexToUint8Array(hex) {
+  // Remove '0x' prefix if present
+  if (hex.startsWith("0x")) {
+      hex = hex.slice(2);
+  }
+
+  if (hex.length !== 64) {
+      throw new Error("Invalid hex address length. Expected 64 characters.");
+  }
+
+  const bytes = hex.match(/.{1,2}/g);
+  if (!bytes) {
+      throw new Error("Invalid hex string.");
+  }
+
+  return new Uint8Array(bytes.map(byte => parseInt(byte, 16)));
+}
+
 const EventCreationForm = ({address}) => {
   const [eventData, setEventData] = useState({
     image: '',
@@ -83,10 +102,22 @@ const EventCreationForm = ({address}) => {
         description: `${eventData.Date_and_Time.date} ${eventData.Date_and_Time.time}`, // Ensure proper string format
       };
   
-      const organizer = {
-        "AccountAddress" : address
-       } 
-       console.log(organizer)
+      // const organizer = {
+      //   "AccountAddress" : address
+      //  } 
+      //  console.log(organizer)
+
+      console.log("\n Organiser Address before", address);
+
+      const organiserAccountAddress = hexToUint8Array(hexAddress);
+
+
+      const organizer =
+      {
+        "accountAddress": organiserAccountAddress
+      }
+
+      console.log("\n Organiser Address after", organizer);
   
       // Ensure the function is awaited
       await ticketing.createCollection(organizer, collectionInfo);
