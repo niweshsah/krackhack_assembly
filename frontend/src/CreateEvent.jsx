@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Plus, Trash2 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { createNewEvent } from './Actions/Event'
-import TicketingSystem from '../../nft_code/dist/main_nft'
-
+// import TicketingSystem from '../../nft_code/dist/main_nft'
+import {TicketingSystem} from '../../nft_code/dist/main_nft_export'
 // import 
 const EventCreationForm = () => {
   const [eventData, setEventData] = useState({
