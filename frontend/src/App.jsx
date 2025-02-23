@@ -10,6 +10,7 @@ import SignUpWindow from './SignUp';
 import React, { useState, useEffect } from 'react';
 import { PetraWallet } from 'petra-plugin-wallet-adapter';
 import { useSelector } from 'react-redux';
+import { TicketingSystem } from '../../nft_code/dist/main_nft_export';
 
 function App() {
   const [wallet, setWallet] = useState(null);
@@ -24,7 +25,7 @@ function App() {
   }, [walletAddress]);
 
   const petraWallet = new PetraWallet();
-
+  
   const connectWallet = async () => {
     setIsLoading(true);
     setError(null);
@@ -35,7 +36,7 @@ function App() {
 
       const account = await petraWallet.account();
       setWalletAddress(account.address);
-      
+
       setIsLoading(false);
       createCollection()
     } catch (error) {
@@ -57,29 +58,28 @@ function App() {
 
     try {
       // Add delay to ensure proper transaction initialization
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // await new Promise(resolve => setTimeout(resolve, 1000));
 
-      const collectionPayload = {
-        type: "entry_function_payload",
-        function: "0x3::token::create_collection_script",
-        arguments: [
-          "ssssa", // Keep name consistent
-          "This is my first NFT collection",
-          "https://example.com/image.png",
-          1000,
-          [false, false, false]
-        ],
-        type_arguments: [],
-      };
+      // const collectionPayload = {
+      //   type: "entry_function_payload",
+      //   function: "0x3::token::create_collection_script",
+      //   arguments: [
+      //     "krackhack1", // Keep name consistent
+      //     "This is my first NFT collection",
+      //     "https://example.com/image.png",
+      //     1000,
+      //     [false, false, false]
+      //   ],
+      //   type_arguments: [],
+      // };
 
-      const response = await petraWallet.signAndSubmitTransaction(collectionPayload);
-      console.log("Collection Created:", response);
+      // const response = await petraWallet.signAndSubmitTransaction(collectionPayload);
+      // console.log("Collection Created:", response);
 
       // Wait for transaction confirmation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setCollectionCreated(true);
-      setIsLoading(false);
+      // await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // setCollectionCreated(true);
       createNFT()
       return true;
     } catch (error) {
@@ -95,21 +95,22 @@ function App() {
       setError("Please connect your wallet first");
       return;
     }
-  
+
     setIsLoading(true);
     setError(null);
-  
+
     try {
       const account = await petraWallet.account();
-      
+      console.log("account: ", account);
+
       // Simplified payload with minimal required parameters
       const nftPayload = {
         type: "entry_function_payload",
         function: "0x3::token::create_token_script",
         arguments: [
-          "ssssa",                           // collection name
-          "My First NFT",                 // token name
-          "This is a special NFT",        // description
+          "krackhack1",                           // collection name
+          "ticket3",                 // token name
+          "VIP",        // description
           "1",                            // supply (as string)
           "1",                            // maximum (as string)
           "https://example.com/nft.json", // uri
@@ -123,18 +124,26 @@ function App() {
         ],
         type_arguments: []
       };
-  
+
       console.log("Attempting to create NFT with payload:", nftPayload);
-  
+
       const pendingTransaction = await petraWallet.signAndSubmitTransaction(nftPayload);
       console.log("Transaction submitted:", pendingTransaction);
-  
+
       // Wait for transaction confirmation
       await new Promise(resolve => setTimeout(resolve, 2000));
-  
+
       setIsLoading(false);
       console.log("NFT creation completed");
-      
+
+      // const sellerTickets = await aptos.getOwnedDigitalAssets({
+      //   ownerAddress: seller.accountAddress,
+      // });
+
+      // if (!sellerTickets.length) {
+      //   throw new NoTicketsAvailableError();
+      // }
+
     } catch (error) {
       console.error("Detailed NFT creation error:", {
         message: error.message,
@@ -142,7 +151,7 @@ function App() {
         data: error.data,
         stack: error.stack
       });
-      
+
       setError(`NFT Creation failed: ${error.message}`);
       setIsLoading(false);
     }
@@ -190,3 +199,4 @@ function App() {
 }
 
 export default App;
+      // setIsLoading(false);

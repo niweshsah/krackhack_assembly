@@ -17,6 +17,8 @@ const alicePrivateKeyBytes = new Uint8Array(ALICE_PRIVATE_KEY_HEX.replace(/^0x/,
 const ALICE_INITIAL_BALANCE = 100000000;
 const BOB_INITIAL_BALANCE = 0;
 const TRANSFER_AMOUNT = 1000000;
+
+
 // Set up the client for Testnet
 //   const APTOS_NETWORK: Network = Network.TESTNET;
 const APTOS_NETWORK = Network.DEVNET;
