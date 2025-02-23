@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Plus, Trash2 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { createNewEvent } from './Actions/Event'
-import TicketingSystem from '../../nft_code/dist/main_nft'
-
+// import TicketingSystem from '../../nft_code/dist/main_nft'
+// const TicketingSystem = require('../../nft_code/dist/main_nft')
+let TicketingSystem;
+import('../../nft_code/dist/main_nft').then((module) => {
+  TicketingSystem = module.default || module;
+});
 // import 
 const EventCreationForm = () => {
   const [eventData, setEventData] = useState({
@@ -16,7 +20,6 @@ const EventCreationForm = () => {
   const [tickets, setTickets] = useState([
     { category: 0, price: '', desc: '', seats_available: 0 }
   ]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'date' || name === 'time') {
@@ -83,7 +86,7 @@ const EventCreationForm = () => {
         description: `${eventData.Date_and_Time.date} ${eventData.Date_and_Time.time}`, // Ensure proper string format
       };
   
-      const organizer = "organizer_wallet_id"; // Replace with actual organizer wallet ID
+      const organizer = "0x773aB01b235D43Ed2f6D0bf00e8d2bb6c8F9a183"; // Replace with actual organizer wallet ID
   
       // Ensure the function is awaited
       await ticketing.createCollection(organizer, collectionInfo);
