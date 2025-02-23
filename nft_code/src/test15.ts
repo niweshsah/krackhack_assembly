@@ -4,27 +4,22 @@ import {
     Aptos,
     AptosConfig,
     Network,
+    NetworkToNetworkName,
     Ed25519PrivateKey,
   } from "@aptos-labs/ts-sdk";
-  
-  // Your private key in hexadecimal format
-  const ALICE_PRIVATE_KEY_HEX = "0x02fbd459d84108d921fe6ac1d30cb6b1404b95fabbc4ac25eb45313bb069ad00";
-  
-  // Convert hex private key to Uint8Array
-  const alicePrivateKeyBytes = new Uint8Array(
-    ALICE_PRIVATE_KEY_HEX.replace(/^0x/, "")
-      .match(/.{1,2}/g)!
-      .map(byte => parseInt(byte, 16))
-  );
   
   const ALICE_INITIAL_BALANCE = 100_000_000;
   const BOB_INITIAL_BALANCE = 0;
   const TRANSFER_AMOUNT = 1_000_000;
   
-  // Set up the client for Testnet
-//   const APTOS_NETWORK: Network = Network.TESTNET;
-  const APTOS_NETWORK = Network.DEVNET;
-
+  // Replace this with your actual private key bytes (Uint8Array or Buffer)
+  const alicePrivateKeyBytes = new Uint8Array([
+    0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
+    0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0,
+  ]);
+  
+  // Set up the client
+  const APTOS_NETWORK: Network = NetworkToNetworkName[process.env.APTOS_NETWORK ?? Network.DEVNET];
   const config = new AptosConfig({ network: APTOS_NETWORK });
   const aptos = new Aptos(config);
   
@@ -56,21 +51,21 @@ import {
   };
   
   const example = async () => {
-    console.log("Using Alice's private key, funding Alice, and transferring to Bob on Testnet.");
+    console.log("This example will use Alice's private key, fund Alice, and transfer to Bob.");
   
     // Fund Alice's account
     console.log("\n=== Funding accounts ===\n");
-    // await aptos.fundAccount({
-    //   accountAddress: alice.accountAddress,
-    //   amount: ALICE_INITIAL_BALANCE,
-    // });
+    await aptos.fundAccount({
+      accountAddress: alice.accountAddress,
+      amount: ALICE_INITIAL_BALANCE,
+    });
   
     // Show the balances
     console.log("\n=== Initial Balances ===\n");
     const aliceBalance = await balance("Alice", alice.accountAddress);
     const bobBalance = await balance("Bob", bob.accountAddress);
   
-    // if (aliceBalance !== ALICE_INITIAL_BALANCE) throw new Error("Alice's balance is incorrect");
+    if (aliceBalance !== ALICE_INITIAL_BALANCE) throw new Error("Alice's balance is incorrect");
     if (bobBalance !== BOB_INITIAL_BALANCE) throw new Error("Bob's balance is incorrect");
   
     // Transfer between users
@@ -93,8 +88,8 @@ import {
       throw new Error("Bob's balance after transfer is incorrect");
   
     // Alice should have the remainder minus gas
-    // if (newAliceBalance >= ALICE_INITIAL_BALANCE - TRANSFER_AMOUNT)
-    //   throw new Error("Alice's balance after transfer is incorrect");
+    if (newAliceBalance >= ALICE_INITIAL_BALANCE - TRANSFER_AMOUNT)
+      throw new Error("Alice's balance after transfer is incorrect");
   };
   
   example();

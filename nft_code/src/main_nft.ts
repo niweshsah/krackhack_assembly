@@ -349,6 +349,8 @@ class TicketingSystem {
       collectionInfo: CollectionInfo
   ): Promise<void> {
       try {
+
+        
           const createCollectionTxn = await this.aptos.createCollectionTransaction({
               creator,
               description: collectionInfo.description,
