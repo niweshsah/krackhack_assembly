@@ -20,7 +20,7 @@ const CONFIG = {
         NORMAL: 8000000, // 0.08 APT max resale for normal
     },
     ROYALTY_PERCENTAGE: 10, // 10%
-    NETWORK: Network.DEVNET,
+    NETWORK: Network.TESTNET,
     MAX_RETRIES: 3,
     RETRY_DELAY: 1000, // 1 second
     MINT_DELAY: 1000, // 1 second between mints
@@ -317,7 +317,7 @@ function main() {
             console.log("\n2. Creating Ticket Collection");
             console.log("--------------------------");
             const collectionInfo = {
-                name: "Concert Tickets",
+                name: "Concert Tickets77979",
                 uri: "https://example.com/tickets",
                 description: "Exclusive event tickets.",
             };

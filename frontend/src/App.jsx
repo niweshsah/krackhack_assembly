@@ -90,6 +90,56 @@ function App() {
     }
   };
 
+  const transferNFT = async (receiverAddress, tokenName) => {
+    if (!petraWallet || !isConnected) {
+      setError("Please connect your wallet first");
+      return;
+    }
+  
+    setIsLoading(true);
+    setError(null);
+  
+    try {
+      const senderAccount = await petraWallet.account();
+      console.log("Sender Address:", senderAccount.address);
+  
+      const transferPayload = {
+        type: "entry_function_payload",
+        function: "0x3::token_transfers::transfer_script",
+        arguments: [
+          senderAccount.address, // Sender's address
+          receiverAddress,       // Receiver's address
+          "krackhack1",          // Collection name
+          tokenName,             // Token name
+          "1"                    // Amount (as string)
+        ],
+        type_arguments: []
+      };
+  
+      console.log("Transfer Payload:", transferPayload);
+  
+      const transaction = await petraWallet.signAndSubmitTransaction(transferPayload);
+      console.log("Transaction submitted:", transaction);
+  
+      // Wait for transaction confirmation
+      await new Promise(resolve => setTimeout(resolve, 2000));
+  
+      setIsLoading(false);
+      console.log("NFT successfully transferred!");
+    } catch (error) {
+      console.error("Failed to transfer NFT:", {
+        message: error.message,
+        code: error.code,
+        data: error.data,
+        stack: error.stack
+      });
+  
+      setError(`NFT Transfer failed: ${error.message}`);
+      setIsLoading(false);
+    }
+  };
+  
+
   const createNFT = async () => {
     if (!petraWallet || !isConnected) {
       setError("Please connect your wallet first");
