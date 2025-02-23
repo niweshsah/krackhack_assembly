@@ -1,37 +1,17 @@
 import React, { useState } from 'react';
-import { Wallet, User, ArrowRight } from 'lucide-react';
-import { useDispatch, useSelector } from "react-redux";
-import {registerUser} from "./Actions/User"
-// import {loginUser} from "./Actions/User"
+import { User, ArrowRight } from 'lucide-react';
+import { useDispatch } from "react-redux";
+import { registerUser } from "./Actions/User";
+
 const SignInWindow = () => {
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [walletAddress, setWalletAddress] = useState('');
-  const [isConnecting, setIsConnecting] = useState(false);
   const dispatch = useDispatch();
-  const connectWallet = async () => {
-    setIsConnecting(true);
-    try {
-      // Check if MetaMask is installed
-      if (typeof window.ethereum !== 'undefined') {
-        // Request account access
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        setWalletAddress(accounts[0]);
-      } else {
-        alert('Please install MetaMask to continue!');
-      }
-    } catch (error) {
-      console.error('Error connecting wallet:', error);
-    }
-    setIsConnecting(false);
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(registerUser(name,email,password));
-    // Handle sign in logic here
-    console.log('Signing in with:', { name, walletAddress });
+    dispatch(registerUser(email, password));
+    console.log('Signing in with:', { email, password });
   };
 
   return (
@@ -47,87 +27,46 @@ const SignInWindow = () => {
               <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
                 Welcome Back
               </h1>
-              <p className="text-gray-400 mt-2">Connect your wallet to continue</p>
+              <p className="text-gray-400 mt-2">Enter your credentials to continue</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Name Input */}
-              <div>
-                <label className="block text-purple-400 mb-2">Your Name</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400" size={20} />
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 pl-12 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
-                    placeholder="Enter your name"
-                    required
-                  />
-                </div>
-              </div>
+              {/* Email Input */}
               <div>
                 <label className="block text-purple-400 mb-2">Your Email</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400" size={20} />
                   <input
-                    type="text"
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 pl-12 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
                     placeholder="Enter your email"
+                    required
                   />
                 </div>
               </div>
 
+              {/* Password Input */}
               <div>
                 <label className="block text-purple-400 mb-2">Your Password</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400" size={20} />
                   <input
-                    type="text"  // Keeping type as "text" as per your request
+                    type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 pl-12 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
                     placeholder="Enter your password"
+                    required
                   />
                 </div>
-              </div>
-              {/* Wallet Connection */}
-              <div>
-                <label className="block text-purple-400 mb-2">Wallet Address</label>
-                <div className="relative">
-                  <Wallet className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400" size={20} />
-                  <input
-                    type="text"
-                    value={walletAddress}
-                    className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 pl-12 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
-                    placeholder="Connect wallet to display address"
-                    readOnly
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={connectWallet}
-                  disabled={isConnecting}
-                  className="mt-2 w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-purple-500/50"
-                >
-                  {isConnecting ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                  ) : (
-                    <>
-                      <Wallet size={20} />
-                      {walletAddress ? 'Wallet Connected' : 'Connect Wallet'}
-                    </>
-                  )}
-                </button>
               </div>
 
               {/* Sign In Button */}
               <button
                 type="submit"
-                disabled={!name || !walletAddress}
+                disabled={!email || !password}
                 className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:shadow-purple-500/50 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Sign In
@@ -137,8 +76,7 @@ const SignInWindow = () => {
 
             {/* Additional Info */}
             <div className="mt-6 text-center text-gray-400 text-sm">
-              <p>Make sure you have MetaMask installed</p>
-              <p className="mt-1">Your wallet will be used to manage your tickets and events</p>
+              <p>Ensure your credentials are correct before proceeding</p>
             </div>
           </div>
         </div>

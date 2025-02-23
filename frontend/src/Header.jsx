@@ -1,22 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import {   X, Music, Ticket, Calendar } from 'lucide-react';
-import { ChevronLeft, ChevronRight,  Search, User, ShoppingCart, Menu, Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'lucide-react';
+import { X, Music, Ticket, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, User, ShoppingCart, Menu, Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
-const Header = () => {
-      const [isMenuOpen, setIsMenuOpen] = useState(false);
-      const [isSearchOpen, setIsSearchOpen] = useState(false);
-      const [scrolled, setScrolled] = useState(false);
-      useEffect(() => {
-        const handleScroll = () => {
-          setScrolled(window.scrollY > 20);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-      }, []);
+
+const Header = ({ isSignedIn = false }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Profile button content based on sign-in state
+  const renderProfileButton = () => {
+    if (isSignedIn) {
+      return (
+        <Link to="/profile" className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
+          <User className="w-5 h-5 text-white" />
+          <span className="text-white">Profile</span>
+        </Link>
+      );
+    }
+    return (
+      <Link to="/signin" className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
+        <User className="w-5 h-5 text-white" />
+        <span className="text-white">Sign Up</span>
+      </Link>
+    );
+  };
+
+  // Mobile menu profile button
+  const renderMobileProfileButton = () => {
+    if (isSignedIn) {
+      return (
+        <Link to="/profile" className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white flex items-center justify-center space-x-2">
+          <User className="w-5 h-5" />
+          <span>Profile</span>
+        </Link>
+      );
+    }
+    return (
+      <Link to="/signin" className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white flex items-center justify-center space-x-2">
+        <User className="w-5 h-5" />
+        <span>Sign Up</span>
+      </Link>
+    );
+  };
 
   return (
     <div>
-            <header className={`fixed w-full z-50 transition-all duration-300 ${
+      <header className={`fixed w-full z-50 transition-all duration-300 ${
         scrolled ? 'bg-black/80 backdrop-blur-lg' : 'bg-transparent'
       }`}>
         <div className="max-w-7xl pb-4 mx-auto">
@@ -32,7 +70,7 @@ const Header = () => {
                   <Ticket className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-white" />
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-transparent bg-clip-text">
-                  PartyTix
+                  TicketApp
                 </span>
               </div>
 
@@ -40,13 +78,13 @@ const Header = () => {
               <nav className="hidden md:flex items-center space-x-8">
                 {/* Animated Nav Items */}
                 <div className="group relative">
-                  <Link to = "/" className="text-white py-2 px-4 rounded-full transition-all duration-300 hover:bg-white/10">
+                  <Link to="/" className="text-white py-2 px-4 rounded-full transition-all duration-300 hover:bg-white/10">
                     Home
                   </Link>
                   <div className="absolute inset-x-0 h-0.5 bottom-0 bg-gradient-to-r from-pink-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
                 </div>
                 <div className="group relative">
-                  <Link to = "/Event" className="text-white py-2 px-4 rounded-full transition-all duration-300 hover:bg-white/10">
+                  <Link to="/event" className="text-white py-2 px-4 rounded-full transition-all duration-300 hover:bg-white/10">
                     Events
                   </Link>
                   <div className="absolute inset-x-0 h-0.5 bottom-0 bg-gradient-to-r from-pink-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
@@ -75,22 +113,8 @@ const Header = () => {
                   <Search className="w-5 h-5 text-white group-hover:text-pink-400" />
                 </button>
 
-                {/* Cart Button with Glow Effect */}
-                <button className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-all duration-300 group relative">
-                  <ShoppingCart className="w-5 h-5 text-white group-hover:text-purple-400" />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full text-xs flex items-center justify-center text-white">
-                    2
-                  </span>
-                </button>
-
-                {/* Profile Button */}
-                <button className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
-                  <User className="w-5 h-5 text-white" />
-                  <Link to='/Signin'>
-                  <span className="text-white">Sign In</span>
-
-                  </Link>
-                </button>
+                {/* Profile/Sign In Button */}
+                {renderProfileButton()}
               </div>
 
               {/* Mobile Menu Button */}
@@ -145,20 +169,14 @@ const Header = () => {
             </nav>
             
             <div className="mt-8 space-y-4">
-              <button className="w-full py-3 px-4 rounded-lg bg-white/10 text-white hover:bg-white/20 flex items-center justify-center space-x-2">
-                <ShoppingCart className="w-5 h-5" />
-                <span>Cart (2)</span>
-              </button>
-              <button className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white flex items-center justify-center space-x-2">
-                <User className="w-5 h-5" />
-                <span>Sign In</span>
-              </button>
+            
+              {renderMobileProfileButton()}
             </div>
           </div>
         </div>
       </header>
     </div>
-  )
-}
+  );
+};
 
 export default Header;

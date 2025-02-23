@@ -141,7 +141,8 @@ const HomePage = () => {
       </div>
         <HeroSection/>
         <div style={{ width: "100vw", height: "100vh" }}>
-      <MircroModel />
+      {/* <MircroModel /> */}
+      {/* <FloatingElements/> */}
     </div>
       {/* Trending Events Section */}
       <div className="max-w-7xl mx-auto px-4 py-12">
