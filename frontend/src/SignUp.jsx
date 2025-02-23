@@ -13,11 +13,11 @@ const SignUpWindow = ({connectWallet,walletAddress}) => { // singup to signin
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(registerUser(name,email,password));
+    dispatch(registerUser(name,email,password,walletAddress));
     // Handle sign in logic here
     console.log('Signing in with:', { name, walletAddress });
   };
-
+  
   return (
     <div className="min-h-screen bg-black p-8 flex items-center justify-center">
       <div className="w-full max-w-md">
@@ -121,7 +121,7 @@ const SignUpWindow = ({connectWallet,walletAddress}) => { // singup to signin
             </form>
             <div className="mt-4 text-center text-gray-400">
               <p>Already have an account?{' '}
-                <Link to="/signup" className="text-pink-400 hover:text-pink-500">
+                <Link to="/signin" className="text-pink-400 hover:text-pink-500">
                   Sign in
                 </Link>
               </p>

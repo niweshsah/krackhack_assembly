@@ -13,6 +13,10 @@ import { useSelector } from 'react-redux';
 import { TicketingSystem } from '../../nft_code/dist/main_nft_export';
 
 function App() {
+  const { isAuthenticated } = useSelector((state) => state.user)
+  return (
+    <Router>
+      <div className="flex flex-col min-h-screen">
   const [wallet, setWallet] = useState(null);
   const [walletAddress, setWalletAddress] = useState("");
   const [isConnected, setIsConnected] = useState(false);
@@ -176,6 +180,19 @@ function App() {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<HomePage />} />
+<<<<<<< HEAD
+            <Route path="/event" element={<EventListing />} />
+            <Route path="/signin" element={isAuthenticated ? <HomePage /> : <SignInWindow />} />
+            <Route path="/signup" element={isAuthenticated ? <HomePage /> : <SignUpWindow />} />
+            <Route
+              path="/profile"
+              element={isAuthenticated ? <ProfileDashboard /> : <SignUpWindow />}
+            />
+            <Route
+              path="/organize"
+              element={isAuthenticated ? <EventCreationForm /> : <SignUpWindow />}
+            />
+=======
             <Route path="/signin" element={<SignInWindow />} />
             <Route
               path="/signup"
@@ -190,6 +207,7 @@ function App() {
             <Route path="/profile" element={<ProfileDashboard />} />
             <Route path="/event" element={<EventListing />} />
             <Route path="/organize" element={<EventCreationForm address={walletAddress} />} />
+>>>>>>> ecdb0048e3be76c541f90bba1b5f2796de4158ab
           </Routes>
         </div>
         <Footer />

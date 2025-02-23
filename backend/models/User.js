@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, "Please Enter Your Name"],
     },
+    walletId : String,
     balance : Number,
     avatar: {
         public_id: String,
@@ -19,7 +20,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, "Please Enter Your Password"],
-        minLength: [6, "Password must be atleast 6 characters"],
+        // minLength: [6, "Password must be atleast 6 characters"],
         select: false
     },
     // Total_Points : Number,
@@ -29,8 +30,7 @@ const userSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Event"
             },
-            category : Number
-            // points : Number
+            category : String,
         },
     ],
     events_organised : [

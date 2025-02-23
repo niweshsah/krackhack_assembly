@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { User, ArrowRight } from 'lucide-react';
 import { useDispatch } from "react-redux";
 import { registerUser } from "./Actions/User";
-
+import { loginUser } from './Actions/User';
 const SignInWindow = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(registerUser(email, password));
-    console.log('Signing in with:', { email, password });
+    dispatch(loginUser(email, password));
+    // const res = await loginUser(email, password);
+    console.log('Signing in with:', { email, password, res });
   };
 
   return (
