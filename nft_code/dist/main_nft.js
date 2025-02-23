@@ -366,11 +366,6 @@ function main() {
         }
     });
 }
-
-// export default {TicketingSystem};
-// export default TicketingSystem;
-module.exports = TicketingSystem;
-
 // Run the system
 main().catch((error) => {
     console.error("Fatal error:", error);
