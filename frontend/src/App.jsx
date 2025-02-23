@@ -18,12 +18,9 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="Signin" element={<SignInWindow />} />
-
-            
             <Route path="/Profile" element={<ProfileDashboard />} />
             <Route path="/Event" element={<EventListing />} />
             <Route path="/organize" element={<EventCreationForm />} />
-
           </Routes>
         </div>
         <Footer />

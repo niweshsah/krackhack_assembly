@@ -8,6 +8,7 @@ cloudinary.config({
 });
 exports.register = async (req, res) => {
     try {
+       console.log("hii")
         const { name , email , password} = req.body;
         let user = await User.findOne({ email });
         if (user) {
@@ -35,6 +36,7 @@ exports.register = async (req, res) => {
         res.status(500).json({
             success: false,
             message: error.message
+            
         })
     }
 }

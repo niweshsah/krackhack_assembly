@@ -1,13 +1,40 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, Plus, Trash2, Upload } from 'lucide-react';
-
+import { Calendar, Clock, MapPin, Plus, Trash2 } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { createNewEvent } from './Actions/Event'
 const EventCreationForm = () => {
+  const [eventData, setEventData] = useState({
+    image: '',
+    title: '',
+    Date_and_Time: { date: '', time: '' },
+    venue: '',
+  });
+  const dispatch = useDispatch();
   const [tickets, setTickets] = useState([
-    { category: '', description: '', price: '', seatsAvailable: '' }
+    { category: 0, price: '', desc: '', seats_available: 0 }
   ]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'date' || name === 'time') {
+      setEventData((prev) => ({
+        ...prev,
+        Date_and_Time: { ...prev.Date_and_Time, [name]: value }
+      }));
+    } else {
+      setEventData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleTicketChange = (index, e) => {
+    const { name, value } = e.target;
+    const updatedTickets = [...tickets];
+    updatedTickets[index][name] = value;
+    setTickets(updatedTickets);
+  };
+
   const addTicketCategory = () => {
-    setTickets([...tickets, { category: '', description: '', price: '', seatsAvailable: '' }]);
+    setTickets([...tickets, { category: '', price: '', desc: '', seats_available: '' }]);
   };
 
   const removeTicketCategory = (index) => {
@@ -16,10 +43,11 @@ const EventCreationForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted');
+    dispatch(createNewEvent(eventData.image , eventData.title , eventData.Date_and_Time ,tickets))
+    console.log('Event Data:', eventData);
+    console.log('Tickets:', tickets);
   };
-
+  
   return (
     <div className="min-h-screen bg-black p-8 pt-[82px]">
       <div className="max-w-4xl mx-auto">
@@ -32,67 +60,64 @@ const EventCreationForm = () => {
             <h2 className="text-2xl font-bold text-white mb-6">Event Details</h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Image Upload */}
-              <div className="relative">
-                <div className="border-2 border-dashed border-purple-400 rounded-lg p-8 text-center hover:border-pink-400 transition-colors">
-                  <Upload className="w-12 h-12 mx-auto mb-4 text-purple-400" />
-                  <input
-                    type="file"
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    accept="image/*"
-                  />
-                  <p className="text-gray-300">Drop your event image here or click to browse</p>
-                </div>
+              <div>
+                <label className="block text-purple-400 mb-2">Enter Image URL</label>
+                <input
+                  type="text"
+                  name="image"
+                  value={eventData.image}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400"
+                  placeholder="Enter event image URL"
+                />
               </div>
-
-              {/* Event Title */}
               <div>
                 <label className="block text-purple-400 mb-2">Event Title</label>
                 <input
                   type="text"
-                  className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
+                  name="title"
+                  value={eventData.title}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400"
                   placeholder="Enter event title"
                 />
               </div>
 
-              {/* Date and Time */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-purple-400 mb-2">Date</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400" size={20} />
-                    <input
-                      type="date"
-                      className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 pl-12 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
-                    />
-                  </div>
+                  <input
+                    type="date"
+                    name="date"
+                    value={eventData.Date_and_Time.date}
+                    onChange={handleChange}
+                    className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400"
+                  />
                 </div>
                 <div>
                   <label className="block text-purple-400 mb-2">Time</label>
-                  <div className="relative">
-                    <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400" size={20} />
-                    <input
-                      type="time"
-                      className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 pl-12 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Venue */}
-              <div>
-                <label className="block text-purple-400 mb-2">Venue</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400" size={20} />
                   <input
-                    type="text"
-                    className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 pl-12 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
-                    placeholder="Enter venue location"
+                    type="time"
+                    name="time"
+                    value={eventData.Date_and_Time.time}
+                    onChange={handleChange}
+                    className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400"
                   />
                 </div>
               </div>
 
-              {/* Ticket Categories */}
+              <div>
+                <label className="block text-purple-400 mb-2">Venue</label>
+                <input
+                  type="text"
+                  name="venue"
+                  value={eventData.venue}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400"
+                  placeholder="Enter venue location"
+                />
+              </div>
+
               <div>
                 <div className="flex justify-between items-center mb-4">
                   <label className="text-2xl text-white">Ticket Categories</label>
@@ -101,11 +126,9 @@ const EventCreationForm = () => {
                     onClick={addTicketCategory}
                     className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
                   >
-                    <Plus size={20} />
-                    Add Category
+                    <Plus size={20} /> Add Category
                   </button>
                 </div>
-
                 <div className="space-y-4">
                   {tickets.map((ticket, index) => (
                     <div key={index} className="bg-gray-800 p-4 rounded-lg border border-purple-400">
@@ -123,50 +146,26 @@ const EventCreationForm = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-purple-400 mb-2">Category Name</label>
-                          <input
-                            type="text"
-                            className="w-full bg-gray-700 border border-purple-400 rounded-lg p-3 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
-                            placeholder="e.g., VIP, Regular"
-                          />
+                          <input type="number" name="category" placeholder="e.g., VIP, Regular" value={ticket.category} onChange={(e) => handleTicketChange(index, e)} />
                         </div>
                         <div>
                           <label className="block text-purple-400 mb-2">Price ($)</label>
-                          <input
-                            type="number"
-                            className="w-full bg-gray-700 border border-purple-400 rounded-lg p-3 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
-                            placeholder="0.00"
-                            min="0"
-                            step="0.01"
-                          />
+                          <input type="text" name="price" placeholder="0.00" value={ticket.price} onChange={(e) => handleTicketChange(index, e)} />
                         </div>
-                        <div className="col-span-full">
+                        <div>
                           <label className="block text-purple-400 mb-2">Description</label>
-                          <input
-                            type="text"
-                            className="w-full bg-gray-700 border border-purple-400 rounded-lg p-3 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
-                            placeholder="Describe what's included"
-                          />
+                          <input type="text" name="desc" placeholder="Describe what's included" value={ticket.desc} onChange={(e) => handleTicketChange(index, e)} />
                         </div>
                         <div>
                           <label className="block text-purple-400 mb-2">Available Seats</label>
-                          <input
-                            type="number"
-                            className="w-full bg-gray-700 border border-purple-400 rounded-lg p-3 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
-                            placeholder="Number of seats"
-                            min="1"
-                          />
+                          <input type="number" name="seats_available" placeholder="Number of seats" value={ticket.seats_available} onChange={(e) => handleTicketChange(index, e)} />
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:shadow-purple-500/50 transition-all duration-300"
-              >
+              <button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 px-8 rounded-lg">
                 Create Event
               </button>
             </form>

@@ -87,15 +87,15 @@ export const loginUser = (email, password) => async (dispatch) => {
       });
     }
   };
-  export const registerUser = (name,email, password , avatar) => async (dispatch) => {
+  export const registerUser = (name,email, password) => async (dispatch) => {
     try {
       dispatch({
         type: "RegisterRequest",
       });
   
       const { data } = await axios.post(
-        "/api/v1/register",
-        { name , email , password , avatar},
+        "http://localhost:5000/api/v1/register",
+        { name , email , password },
         {
           headers: {
             "Content-Type": "application/json",
@@ -110,7 +110,7 @@ export const loginUser = (email, password) => async (dispatch) => {
     } catch (error) {
       dispatch({
         type: "RegisterFailure",
-        payload: error.response.data.message,
+        payload: error.response.data.success,
       });
     }
   };
