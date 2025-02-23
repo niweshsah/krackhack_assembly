@@ -427,6 +427,7 @@ async function main() {
         // gaurav secret key
         const user1 = Account.fromPrivateKey({ privateKey: user1key });
 
+        user1.accountAddress
 
         const users = [user1];
 
