@@ -292,21 +292,51 @@ export class TicketingSystem {
             }
         });
     }
+    func(title) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+            const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
+            // const user1key = new Ed25519PrivateKey("0x0d2942f0a8ab3d057e426b0f8bdcb3a639d359f91a56a1ee761c4169db06351e");
+            // // gaurav secret key
+            // const user1 = Account.fromPrivateKey({ privateKey: user1key });
+            // user1.accountAddress
+            // const users = [user1];
+            //   await ticketing.initializeAccounts(organizer, users);
+            // Print initial balances
+            //   const accounts: AccountInfo[] = [
+            //       { name: "Organizer", account: organizer },
+            //       ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
+            //   ];
+            //   await printBalances(accounts);
+            //   console.log('\n Organiser Account Address:', organizer.accountAddress);
+            //   console.log('\n account type: ', typeof organizer);
+            //   console.log('\n organiser:', organizer);
+            // Create collection
+            console.log("\n2. Creating Ticket Collection");
+            console.log("--------------------------");
+            console.log("title: ", title);
+            const collectionInfo = {
+                name: title,
+                uri: "https://example.com/tickets",
+                description: "Exclusive event tickets.",
+            };
+            yield this.createCollection(organizer, collectionInfo);
+
+
+            console.log("\n3.a Minting VIP Tickets");
+            console.log("----------------");
+            yield this.mintTicketNFT(organizer, collectionInfo.name, "tickets for event", "https://example.com/vip-ticket", 2, "VIP");
+            // Mint normal tickets
+            console.log("\n3.b Minting Normal Tickets");
+            console.log("----------------");
+            yield this.mintTicketNFT(organizer, collectionInfo.name, "tickets for event", "https://example.com/normal-ticket", 2, "NORMAL");
+            // Initial ticket sales
+
+
+
+        });
+    }
 }
-
-// let organizer;
-// let organizer;
-
-// export async function getOrganizer() {
-//     if (!organizer) {
-//         const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
-//         organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
-//     }
-//     return organizer;
-// }
-
-
-
 
 // =============== Main Function ===============
 function main() {
@@ -321,14 +351,13 @@ function main() {
             //   const organizer = Account.generate();
             //   const users = [Account.generate(), Account.generate()];
             //   const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
-            //     organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
-            // const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
-            // const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
-
-
+            //     const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
+            const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+            const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
             const user1key = new Ed25519PrivateKey("0x0d2942f0a8ab3d057e426b0f8bdcb3a639d359f91a56a1ee761c4169db06351e");
             // gaurav secret key
             const user1 = Account.fromPrivateKey({ privateKey: user1key });
+            user1.accountAddress;
             const users = [user1];
             //   await ticketing.initializeAccounts(organizer, users);
             // Print initial balances
@@ -343,12 +372,12 @@ function main() {
             // Create collection
             console.log("\n2. Creating Ticket Collection");
             console.log("--------------------------");
-            const collectionInfo = {
-                name: "Concert Tickets10",
-                uri: "https://example.com/tickets",
-                description: "Exclusive event tickets.",
-            };
-            yield ticketing.createCollection(organizer, collectionInfo);
+            // const collectionInfo = {
+            //     name: "Concert Tickets10",
+            //     uri: "https://example.com/tickets",
+            //     description: "Exclusive event tickets.",
+            // };
+            // yield ticketing.createCollection(organizer, collectionInfo);
             // Mint VIP tickets
             console.log("\n3.a Minting VIP Tickets");
             console.log("----------------");

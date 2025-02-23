@@ -257,6 +257,7 @@
 
 //     try {
 //         // Assuming `ticketing` is already defined in the component
+//         // Assuming ticketing is already defined in the component
 //         console.log("\n2. Creating Ticket Collection");
 //         console.log("--------------------------");
 //         const ticketing = new TicketingSystem();
@@ -269,6 +270,7 @@
 //         const collectionInfo = {
 //             name: {title},
 //             // name: `${title}-${Date.now()}-${uuidv4().slice(0, 8)}`, // Unique name with title
+//             // name: ${title}-${Date.now()}-${uuidv4().slice(0, 8)}, // Unique name with title
 //             uri: "https://example.com/tickets",
 //             description: "Exclusive event tickets.",
 //         };
@@ -340,25 +342,13 @@
 
 import { Buffer } from 'buffer';
 
-// export const getOrganizer = async () => {
-//   // Example issue: Converting private key string into Buffer
-//   let privateKeyHex = "YOUR_PRIVATE_KEY"; // Replace with actual logic
-//   let privateKeyBuffer = Buffer.from(privateKeyHex, 'hex'); // Ensure Buffer is available
-
-//   return privateKeyBuffer; // Adjust return logic as needed
-// };
-
-
-
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { createNewEvent } from './Actions/Event';
-// import { TicketingSystem } from '../../nft_code/dist/main_nft_export';
-// import { getOrganizer } from '../../nft_code/dist/main_nft_export';
-// import { ORGANIZER_ACCOUNT } from '../../nft_code/dist/main_nft_export';
+import { TicketingSystem } from '../../nft_code/dist/main_nft_export';
 
-// const ticketing = new TicketingSystem(); // Keep this outside to avoid re-instantiating
+const ticketing = new TicketingSystem(); // Keep this outside to avoid re-instantiating
 
 const EventCreationForm = () => {
   const [image, setImage] = useState('');
@@ -372,14 +362,6 @@ const EventCreationForm = () => {
   // const [organizer, setOrganizer] = useState(null);
 
   const dispatch = useDispatch();
-
-  // useEffect(() => {
-  //   const fetchOrganizer = async () => {
-  //     const organizerAccount = await getOrganizer();
-  //     setOrganizer(organizerAccount);
-  //   };
-  //   fetchOrganizer();
-  // }, []);
 
   const handleTicketChange = useCallback((index, e) => {
     const { name, value } = e.target;
@@ -406,18 +388,8 @@ const EventCreationForm = () => {
 
     try {
       console.log("Creating Ticket Collection...");
-      
-      const collectionInfo = {
-        name: title,
-        uri: "https://example.com/tickets",
-        description: "Exclusive event tickets."
-      };
 
-      // organizer = ORGANIZER_ACCOUNT.organizer1;
-
-      // console.log("Organizer: ", organizer);
-      
-      // await ticketing.createCollection(organizer, collectionInfo);
+      await ticketing.func(title);
       
       dispatch(createNewEvent({ title, date, time, venue, organiser, artist, tickets }));
       console.log("Event successfully created!");
