@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,14 +7,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const ts_sdk_1 = require("@aptos-labs/ts-sdk");
+import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 const INITIAL_BALANCE = 100000000; // 1 APT
 const TICKET_PRICE = 5000000; // 0.05 APT (5M Octas)
 const ROYALTY_PERCENTAGE = 10; // 10% royalty to organizer
-const APTOS_NETWORK = ts_sdk_1.Network.DEVNET;
-const config = new ts_sdk_1.AptosConfig({ network: APTOS_NETWORK });
-const aptos = new ts_sdk_1.Aptos(config);
+const APTOS_NETWORK = Network.DEVNET;
+const config = new AptosConfig({ network: APTOS_NETWORK });
+const aptos = new Aptos(config);
 // Helper function to print balances
 const printBalances = (accounts) => __awaiter(void 0, void 0, void 0, function* () {
     for (const { name, account } of accounts) {
@@ -27,8 +25,8 @@ const printBalances = (accounts) => __awaiter(void 0, void 0, void 0, function* 
 const ticketingSystem = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("🎟 NFT Ticketing System: Organizer sells tickets, users buy and resell with royalties.");
     // Create organizer and multiple user accounts
-    const organizer = ts_sdk_1.Account.generate();
-    const users = [ts_sdk_1.Account.generate(), ts_sdk_1.Account.generate(), ts_sdk_1.Account.generate()]; // 3 users
+    const organizer = Account.generate();
+    const users = [Account.generate(), Account.generate(), Account.generate()]; // 3 users
     console.log(`Organizer Address: ${organizer.accountAddress}`);
     users.forEach((user, index) => {
         console.log(`User ${index + 1} Address: ${user.accountAddress}`);

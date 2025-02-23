@@ -8,6 +8,8 @@ import {
   TransactionResponse,
 } from "@aptos-labs/ts-sdk";
 
+
+
 // =============== Constants ===============
 const CONFIG = {
   INITIAL_BALANCE: 100_000_000, // 1 APT
@@ -349,6 +351,8 @@ class TicketingSystem {
               name: collectionInfo.name,
               uri: collectionInfo.uri,
           });
+
+
 
           await this.submitTransactionWithRetry(creator, createCollectionTxn);
           console.log("🎨 Collection created successfully!");

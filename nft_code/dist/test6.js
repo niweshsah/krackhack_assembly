@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,15 +7,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const ts_sdk_1 = require("@aptos-labs/ts-sdk");
+import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 // Constants
 const CONFIG = {
     INITIAL_BALANCE: 100000000, // 1 APT
     TICKET_PRICE: 5000000, // 0.05 APT
     MAX_RESALE_PRICE: 8000000, // 0.08 APT
     ROYALTY_PERCENTAGE: 10, // 10%
-    NETWORK: ts_sdk_1.Network.DEVNET,
+    NETWORK: Network.DEVNET,
     MAX_RETRIES: 3,
     RETRY_DELAY: 1000 // 1 second
 };
@@ -34,8 +32,8 @@ class TicketingSystem {
         throw new Error("Method not implemented.");
     }
     constructor() {
-        this.config = new ts_sdk_1.AptosConfig({ network: CONFIG.NETWORK });
-        this.aptos = new ts_sdk_1.Aptos(this.config);
+        this.config = new AptosConfig({ network: CONFIG.NETWORK });
+        this.aptos = new Aptos(this.config);
     }
     initializeAccounts(organizer, users) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -157,8 +155,8 @@ function main() {
             console.log("\n🎟 Starting NFT Ticketing System\n==============================");
             const ticketing = new TicketingSystem();
             console.log("\n1️⃣ Creating Accounts...");
-            const organizer = ts_sdk_1.Account.generate();
-            const user = ts_sdk_1.Account.generate();
+            const organizer = Account.generate();
+            const user = Account.generate();
             const accounts = [
                 { name: "Organizer", account: organizer },
                 { name: "User", account: user }

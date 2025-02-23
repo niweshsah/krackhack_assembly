@@ -124,15 +124,44 @@
 
 
 
+// {
+//   "compilerOptions": {
+//     "outDir": "dist",        // Output folder for compiled JS
+//     "module": "CommonJS",    // Ensures compatibility with Node.js
+//     "target": "ES6",         // Output JavaScript version
+//     "strict": true,          // Enables strict type checking
+//     "esModuleInterop": true  // Allows easier imports
+//   },
+//   "include": ["src"]         // Ensure your TS files are inside "src"
+// }
+
+// {
+//   "compilerOptions": {
+//     "outDir": "dist",
+//     "module": "ESNext",  
+//     "target": "ES6",
+//     "strict": true,
+//     "esModuleInterop": true
+//   },
+//   "include": ["src"]
+// }
+
+
 {
   "compilerOptions": {
-    "outDir": "dist",        // Output folder for compiled JS
-    "module": "CommonJS",    // Ensures compatibility with Node.js
-    "target": "ES6",         // Output JavaScript version
-    "strict": true,          // Enables strict type checking
-    "esModuleInterop": true  // Allows easier imports
+    "outDir": "dist",         // Output folder for compiled JS
+    "module": "ESNext",       // Uses the latest ECMAScript module system
+    "target": "ES6",          // Outputs JavaScript in ES6 standard
+    "strict": true,           // Enables strict type checking
+    "esModuleInterop": true,  // Allows easier CommonJS imports
+    "moduleResolution": "Node", // Ensures compatibility with Node.js module resolution
+    "forceConsistentCasingInFileNames": true, // Prevents case-sensitive import issues
+    "skipLibCheck": true,      // Skips type checking of declaration files for faster compilation
+    "allowJs": true,           // Allows JS files in the project
+    "resolveJsonModule": true  // Enables importing JSON modules
   },
-  "include": ["src"]         // Ensure your TS files are inside "src"
+  "include": ["src"],          // Ensure your TS files are inside "src"
+  "exclude": ["node_modules", "dist"] // Exclude unnecessary folders
 }
 
 
