@@ -7,7 +7,7 @@ const Header = ({ isSignedIn = false }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
+  
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);

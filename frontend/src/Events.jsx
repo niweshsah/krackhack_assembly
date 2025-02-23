@@ -244,7 +244,6 @@ const EventListing = () => {
   }, [dispatch]);
 
   const { events = [], loading } = useSelector((state) => state.event);
-
   const EventCard = ({ event }) => (
     <div className="bg-black/40 rounded-xl overflow-hidden group hover:shadow-[0_0_30px_rgba(236,72,153,0.3)] transition-all duration-300">
       <div className="relative">
@@ -254,7 +253,7 @@ const EventListing = () => {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 bg-pink-500 text-white px-3 py-1 rounded-full text-sm">
-          ${event.price}
+          ${event.tickets[0].price}
         </div>
       </div>
       <div className="p-6">

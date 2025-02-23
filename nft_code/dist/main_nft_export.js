@@ -321,6 +321,8 @@ function main() {
                 uri: "https://example.com/tickets",
                 description: "Exclusive event tickets.",
             };
+            console.log('\norganizer type: ',typeof organizer.accountAddress );
+            console.log('\norganizer: ', organizer.accountAddress.data);
             yield ticketing.createCollection(organizer, collectionInfo);
             // Mint VIP tickets
             console.log("\n3.a Minting VIP Tickets");
