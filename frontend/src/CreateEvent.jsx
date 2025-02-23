@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Plus, Trash2 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { createNewEvent } from './Actions/Event'
+import TicketingSystem from '../../nft_code/dist/main_nft'
+
+// import 
 const EventCreationForm = () => {
   const [eventData, setEventData] = useState({
     image: '',
@@ -43,11 +46,24 @@ const EventCreationForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(createNewEvent(eventData.image , eventData.title , eventData.Date_and_Time ,tickets))
+    dispatch(createNewEvent(eventData.image, eventData.title, eventData.Date_and_Time, tickets))
+    const ticketing = new TicketingSystem();
+
+    console.log("\n2. Creating Ticket Collection");
+    console.log("--------------------------");
+    const collectionInfo = {
+      name: eventData.title,
+      uri: "https://example.com/tickets-in-frontend",
+      description: eventData.Date_and_Time,
+    };
+    yield ticketing.createCollection(organizer, collectionInfo);
+
+
+
     console.log('Event Data:', eventData);
     console.log('Tickets:', tickets);
   };
-  
+
   return (
     <div className="min-h-screen bg-black p-8 pt-[82px]">
       <div className="max-w-4xl mx-auto">
@@ -58,7 +74,7 @@ const EventCreationForm = () => {
         <div className="bg-gray-900 border-2 border-purple-500 shadow-2xl rounded-lg overflow-hidden">
           <div className="p-6">
             <h2 className="text-2xl font-bold text-white mb-6">Event Details</h2>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-purple-400 mb-2">Enter Image URL</label>
