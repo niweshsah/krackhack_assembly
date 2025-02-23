@@ -350,6 +350,8 @@ class TicketingSystem {
               uri: collectionInfo.uri,
           });
 
+          
+
           await this.submitTransactionWithRetry(creator, createCollectionTxn);
           console.log("🎨 Collection created successfully!");
       } catch (error) {

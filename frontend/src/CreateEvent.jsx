@@ -3,6 +3,15 @@ import { Calendar, Clock, MapPin, Plus, Trash2 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { createNewEvent } from './Actions/Event'
 import TicketingSystem from '../../nft_code/dist/main_nft'
+import {
+  Account,
+  Aptos,
+  AptosConfig,
+  Ed25519Account,
+  InputViewFunctionData,
+  Network,
+  TransactionResponse,
+} from "@aptos-labs/ts-sdk";
 
 // import 
 const EventCreationForm = () => {
@@ -65,6 +74,7 @@ const EventCreationForm = () => {
   //   console.log('Tickets:', tickets);
   // };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -83,7 +93,10 @@ const EventCreationForm = () => {
         description: `${eventData.Date_and_Time.date} ${eventData.Date_and_Time.time}`, // Ensure proper string format
       };
   
-      const organizer = "organizer_wallet_id"; // Replace with actual organizer wallet ID
+      // const organizer = "organizer_wallet_id"; // Replace with actual organizer wallet ID
+
+      const organizer = Account.generate();
+      console.log("Organizer:", organizer);
   
       // Ensure the function is awaited
       await ticketing.createCollection(organizer, collectionInfo);

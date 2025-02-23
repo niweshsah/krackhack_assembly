@@ -368,6 +368,7 @@ function main() {
         }
     });
 }
+export { TicketingSystem };
 // Run the system
 main().catch((error) => {
     console.error("Fatal error:", error);
