@@ -27,9 +27,9 @@ const FloatingElements = () => {
   }, []);
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-black">
+    <div className="relative h-screen w-full  bg-black">
       {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-blue-900" />
+      <div className="absolute inset-0 " />
       
       {/* Animated Circles */}
       <div className="absolute inset-0">

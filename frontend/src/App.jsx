@@ -7,7 +7,7 @@ import EventListing from './Events';
 import EventCreationForm from './CreateEvent';
 import ProfileDashboard from './ProfilePage';
 import SignInWindow from './SignIn';
-
+import SignUpWindow from './SignUp'
 function App() {
   return (
     <Router>
@@ -17,9 +17,11 @@ function App() {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="Signin" element={<SignInWindow />} />
-            <Route path="/Profile" element={<ProfileDashboard />} />
-            <Route path="/Event" element={<EventListing />} />
+            <Route path="/signin" element={<SignUpWindow />} />
+            <Route path="/signup" element={<SignInWindow />} />
+
+            <Route path="/profile" element={<ProfileDashboard />} />
+            <Route path="/event" element={<EventListing />} />
             <Route path="/organize" element={<EventCreationForm />} />
           </Routes>
         </div>
