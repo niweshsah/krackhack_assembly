@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Account, Aptos, AptosConfig, Network, } from "@aptos-labs/ts-sdk";
+// import {  } from "aptos";
 // =============== Constants ===============
 const CONFIG = {
     INITIAL_BALANCE: 100000000, // 1 APT

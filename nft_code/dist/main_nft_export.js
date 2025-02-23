@@ -306,6 +306,12 @@ function main() {
                 { name: "Organizer", account: organizer },
                 ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
             ];
+            console.log("\n organizer: ", organizer);
+
+            const walletAddress = "0x18cab2e30ce3501a2ccb..." // Your Aptos wallet address
+            const accountAddress = AccountAddress.fromHex(walletAddress);
+
+            console.log
             yield ticketing.printBalances(accounts);
             // Create collection
             console.log("\n2. Creating Ticket Collection");

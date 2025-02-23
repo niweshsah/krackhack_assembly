@@ -6,8 +6,10 @@ import {
   InputViewFunctionData,
   Network,
   TransactionResponse,
+  AccountAddress,
 } from "@aptos-labs/ts-sdk";
 
+// import {  } from "aptos";
 
 
 // =============== Constants ===============
@@ -408,6 +410,7 @@ async function main() {
           ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
       ];
       await ticketing.printBalances(accounts);
+      
 
       // Create collection
       console.log("\n2. Creating Ticket Collection");
