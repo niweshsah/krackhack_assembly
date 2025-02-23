@@ -4,7 +4,8 @@ import { useDispatch } from 'react-redux';
 import { createNewEvent } from './Actions/Event'
 // import TicketingSystem from '../../nft_code/dist/main_nft'
 import {TicketingSystem} from '../../nft_code/dist/main_nft_export'
-const EventCreationForm = () => {
+import { AccountAddress } from '@aptos-labs/ts-sdk';
+const EventCreationForm = ({address}) => {
   const [eventData, setEventData] = useState({
     image: '',
     title: '',
@@ -82,7 +83,10 @@ const EventCreationForm = () => {
         description: `${eventData.Date_and_Time.date} ${eventData.Date_and_Time.time}`, // Ensure proper string format
       };
   
-      const organizer = "0x773aB01b235D43Ed2f6D0bf00e8d2bb6c8F9a183"; // Replace with actual organizer wallet ID
+      const organizer = {
+        "AccountAddress" : address
+       } 
+       console.log(organizer)
   
       // Ensure the function is awaited
       await ticketing.createCollection(organizer, collectionInfo);
