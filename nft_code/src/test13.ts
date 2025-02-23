@@ -16,6 +16,8 @@ import {
       .match(/.{1,2}/g)!
       .map(byte => parseInt(byte, 16))
   );
+
+  
   
   const ALICE_INITIAL_BALANCE = 100_000_000;
   const BOB_INITIAL_BALANCE = 0;
