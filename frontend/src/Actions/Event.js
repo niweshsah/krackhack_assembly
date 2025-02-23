@@ -7,8 +7,7 @@ export const getEvents =
                 dispatch({
                     type: "allEventsRequest",
                 });
-
-                const { data } = await axios.get("/api/v1/events");
+                const { data } = await axios.get("http://localhost:5000/api/v1/events");
                 dispatch({
                     type: "allEventsSuccess",
                     payload: data.events,
@@ -79,7 +78,7 @@ export const createNewEvent = (image, title, Date_and_Time, tickets) => async (d
         });
         // const { data } = await axios.get(`/api/v1/post/${id}`);
         const { data } = await axios.post(
-            "/api/v1/event/book_ticket",
+            "http://localhost:5000/api/v1/event/create",
             {image, title, Date_and_Time, tickets},
             {
               headers: {

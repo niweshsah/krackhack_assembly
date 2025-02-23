@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Wallet, User, ArrowRight } from 'lucide-react';
-
+import { useDispatch, useSelector } from "react-redux";
+import {registerUser} from "./Actions/User"
+// import {loginUser} from "./Actions/User"
 const SignInWindow = () => {
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
-
+  const dispatch = useDispatch();
   const connectWallet = async () => {
     setIsConnecting(true);
     try {
@@ -25,6 +29,7 @@ const SignInWindow = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    dispatch(registerUser(name,email,password));
     // Handle sign in logic here
     console.log('Signing in with:', { name, walletAddress });
   };
@@ -35,7 +40,7 @@ const SignInWindow = () => {
         {/* Glowing border effect */}
         <div className="relative">
           <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg blur opacity-75 animate-pulse" />
-          
+
           <div className="relative bg-gray-900 rounded-lg shadow-xl p-8">
             {/* Header */}
             <div className="text-center mb-8">
@@ -61,7 +66,33 @@ const SignInWindow = () => {
                   />
                 </div>
               </div>
+              <div>
+                <label className="block text-purple-400 mb-2">Your Email</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400" size={20} />
+                  <input
+                    type="text"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 pl-12 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
+                    placeholder="Enter your email"
+                  />
+                </div>
+              </div>
 
+              <div>
+                <label className="block text-purple-400 mb-2">Your Password</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400" size={20} />
+                  <input
+                    type="text"  // Keeping type as "text" as per your request
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 pl-12 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
+                    placeholder="Enter your password"
+                  />
+                </div>
+              </div>
               {/* Wallet Connection */}
               <div>
                 <label className="block text-purple-400 mb-2">Wallet Address</label>
@@ -75,7 +106,7 @@ const SignInWindow = () => {
                     readOnly
                   />
                 </div>
-                
+
                 <button
                   type="button"
                   onClick={connectWallet}

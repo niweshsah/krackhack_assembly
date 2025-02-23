@@ -12,6 +12,7 @@ cloudinary.config({
 
 exports.createEvent = async (req, res) => {
   try {
+    console.log("bye")
     const { image, title, Date_and_Time, tickets } = req.body;
 
     // Validate required fields
@@ -59,7 +60,7 @@ exports.createEvent = async (req, res) => {
         public_id: myCloud.public_id,
         url: myCloud.secure_url,
       },
-      organiser: req.user._id,
+      organiser: "67b98b04f6cdb3024c18ba96",
       isFinish: false,
       tickets, // Store ticket details in the event
     };
@@ -125,6 +126,7 @@ exports.all_events = async (req, res) => {
     try {
       const query = req.query.name ? { name: { $regex: req.query.name, $options: "i" } } : {};
       const events = await Event.find(query);
+      console.log("hello")
       res.status(200).json({
         success: true,
         events

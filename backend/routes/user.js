@@ -8,8 +8,8 @@ router.route("/login").post(login); // working
 router.route("/logout").get(logout); // working
 router.route("/me").get(isAuthenticated, myProfile); // working
 router.route("/users").get(isAuthenticated, getAllUsers); // working
-router.route("/event/create").post(isAuthenticated,createEvent); // working
+router.route("/event/create").post(createEvent); // working
 router.route("/event/review").post(isAuthenticated,review_event); // working
-router.route("/events").get(isAuthenticated,all_events); // working
+router.route("/events").get(all_events); // working
 router.route("/event/book_ticket").post(isAuthenticated,book_ticket);
 module.exports = router

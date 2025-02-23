@@ -75,6 +75,8 @@ class TicketingSystem {
             throw new TicketingError('Max retry attempts reached', lastError);
         });
     }
+
+    
     printBalances(accounts) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -92,6 +94,8 @@ class TicketingSystem {
             }
         });
     }
+
+
     mintTicketNFT(creator, collectionName, ticketName, ticketURI, totalTickets) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -105,6 +109,8 @@ class TicketingSystem {
                         name: `${ticketName} #${i + 1}`,
                         uri: ticketURI,
                     });
+
+
                     yield this.submitTransactionWithRetry(creator, mintTicketTxn);
                     if (i < totalTickets - 1) {
                         yield new Promise(resolve => setTimeout(resolve, CONFIG.MINT_DELAY));
