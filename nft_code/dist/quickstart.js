@@ -1,4 +1,3 @@
-"use strict";
 // /**
 //  * This example shows how to use the Aptos client to create accounts, fund them, and transfer between them.
 //  */
@@ -11,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 // import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 // const APTOS_COIN = "0x1::aptos_coin::AptosCoin";
 // const COIN_STORE = `0x1::coin::CoinStore<${APTOS_COIN}>`;
@@ -185,18 +183,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // }
 // createNFT();
 // Above code is my own code to create NFTs and transfer them to other accounts.
-const ts_sdk_1 = require("@aptos-labs/ts-sdk");
+import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 const INITIAL_BALANCE = 100000000;
 // Set up the client
 // const APTOS_NETWORK: Network = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.DEVNET;
-const APTOS_NETWORK = ts_sdk_1.Network.DEVNET;
-const config = new ts_sdk_1.AptosConfig({ network: APTOS_NETWORK });
-const aptos = new ts_sdk_1.Aptos(config);
+const APTOS_NETWORK = Network.DEVNET;
+const config = new AptosConfig({ network: APTOS_NETWORK });
+const aptos = new Aptos(config);
 const example = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("This example will create and fund Alice and Bob, then Alice account will create a collection and a digital asset in that collection and transfer it to Bob.");
     // Create Alice and Bob accounts
-    const alice = ts_sdk_1.Account.generate();
-    const bob = ts_sdk_1.Account.generate();
+    const alice = Account.generate();
+    const bob = Account.generate();
     console.log("=== Addresses ===\n");
     console.log(`Alice's address is: ${alice.accountAddress}`);
     // Fund and create the accounts

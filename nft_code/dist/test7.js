@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,15 +7,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const ts_sdk_1 = require("@aptos-labs/ts-sdk");
+import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 // Constants
 const CONFIG = {
     INITIAL_BALANCE: 100000000, // 1 APT
     TICKET_PRICE: 5000000, // 0.05 APT
     MAX_RESALE_PRICE: 8000000, // 0.08 APT
     ROYALTY_PERCENTAGE: 10, // 10%
-    NETWORK: ts_sdk_1.Network.DEVNET,
+    NETWORK: Network.DEVNET,
     MAX_RETRIES: 3,
     RETRY_DELAY: 1000, // 1 second
     MINT_DELAY: 1000 // 1 second between mints
@@ -31,8 +29,8 @@ class TicketingError extends Error {
 }
 class TicketingSystem {
     constructor() {
-        this.config = new ts_sdk_1.AptosConfig({ network: CONFIG.NETWORK });
-        this.aptos = new ts_sdk_1.Aptos(this.config);
+        this.config = new AptosConfig({ network: CONFIG.NETWORK });
+        this.aptos = new Aptos(this.config);
     }
     waitWithRetry(hash) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -300,8 +298,8 @@ function main() {
             // Initialize accounts
             console.log("\n1. Creating Accounts");
             console.log("-------------------");
-            const organizer = ts_sdk_1.Account.generate();
-            const users = [ts_sdk_1.Account.generate(), ts_sdk_1.Account.generate()];
+            const organizer = Account.generate();
+            const users = [Account.generate(), Account.generate()];
             yield ticketing.initializeAccounts(organizer, users);
             // Print initial balances
             const accounts = [

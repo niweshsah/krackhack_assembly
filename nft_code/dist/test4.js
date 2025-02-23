@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,22 +7,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const ts_sdk_1 = require("@aptos-labs/ts-sdk");
+import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 const INITIAL_BALANCE = 100000000; // 1 APT
 const TICKET_PRICE = 5000000; // 0.05 APT (5M Octas)
-const APTOS_NETWORK = ts_sdk_1.Network.DEVNET;
+const APTOS_NETWORK = Network.DEVNET;
 // Use your actual Move module address
 const MODULE_ADDRESS = "0x712126eae6719d5eec155ecbbdca24138926cef127d4d5b9aaa8642acce200fd";
 const FUNCTION_CREATE_TICKET = `${MODULE_ADDRESS}::event_ticketing::create_ticket`;
 const FUNCTION_TRANSFER_TICKET = `${MODULE_ADDRESS}::event_ticketing::transfer_ticket`;
-const config = new ts_sdk_1.AptosConfig({ network: APTOS_NETWORK });
-const aptos = new ts_sdk_1.Aptos(config);
+const config = new AptosConfig({ network: APTOS_NETWORK });
+const aptos = new Aptos(config);
 const ticketingSystem = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("🎟 NFT Ticketing System with Royalties on Resale\n");
-    const organizer = ts_sdk_1.Account.generate();
-    const user1 = ts_sdk_1.Account.generate();
-    const user2 = ts_sdk_1.Account.generate();
+    const organizer = Account.generate();
+    const user1 = Account.generate();
+    const user2 = Account.generate();
     console.log(`Organizer: ${organizer.accountAddress}`);
     console.log(`User 1: ${user1.accountAddress}`);
     console.log(`User 2: ${user2.accountAddress}\n`);

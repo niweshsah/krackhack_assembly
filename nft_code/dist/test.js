@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,19 +7,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const ts_sdk_1 = require("@aptos-labs/ts-sdk");
+import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 const INITIAL_BALANCE = 1000000000; // 10 APT
 const TICKET_PRICE = 50000000; // 0.5 APT (50M Octas)
-const APTOS_NETWORK = ts_sdk_1.Network.DEVNET;
+const APTOS_NETWORK = Network.DEVNET;
 // const APTOS_NETWORK = Network.LOCAL;
-const config = new ts_sdk_1.AptosConfig({ network: APTOS_NETWORK });
-const aptos = new ts_sdk_1.Aptos(config);
+const config = new AptosConfig({ network: APTOS_NETWORK });
+const aptos = new Aptos(config);
 const ticketingSystem = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("🎟 NFT Ticketing System: Organizer sells tickets, users buy.\n");
     // Create organizer and user accounts
-    const organizer = ts_sdk_1.Account.generate();
-    const user = ts_sdk_1.Account.generate();
+    const organizer = Account.generate();
+    const user = Account.generate();
     console.log(`Organizer Address: ${organizer.accountAddress}`);
     console.log(`User Address: ${user.accountAddress}\n`);
     // Fund both accounts
