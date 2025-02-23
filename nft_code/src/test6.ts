@@ -3,8 +3,7 @@ import {
     Aptos, 
     AptosConfig, 
     Ed25519Account, 
-    Network,
-    TransactionResponse
+    Network
   } from "@aptos-labs/ts-sdk";
   
   // Constants
@@ -15,27 +14,13 @@ import {
     ROYALTY_PERCENTAGE: 10, // 10%
     NETWORK: Network.DEVNET,
     MAX_RETRIES: 3,
-    RETRY_DELAY: 1000, // 1 second
-    MINT_DELAY: 1000 // 1 second between mints
+    RETRY_DELAY: 1000 // 1 second
   } as const;
   
-  // Types
+  // Interfaces
   interface AccountInfo {
     name: string;
     account: Ed25519Account;
-  }
-  
-  interface BuyTicketParams {
-    buyer: Ed25519Account;
-    seller: Ed25519Account;
-    price: number;
-  }
-  
-  interface ResellTicketParams {
-    seller: Ed25519Account;
-    buyer: Ed25519Account;
-    resalePrice: number;
-    organizer: Ed25519Account;
   }
   
   interface CollectionInfo {
@@ -44,15 +29,19 @@ import {
     description: string;
   }
   
-  // Custom error class
+  // Error class
   class TicketingError extends Error {
     constructor(message: string, public readonly cause?: unknown) {
       super(message);
-      this.name = 'TicketingError';
+      this.name = "TicketingError";
     }
   }
   
+  // Ticketing System Class
   class TicketingSystem {
+    fetchUserNFTs(user: Ed25519Account) {
+        throw new Error("Method not implemented.");
+    }
     private readonly aptos: Aptos;
     private readonly config: AptosConfig;
   
@@ -60,6 +49,31 @@ import {
       this.config = new AptosConfig({ network: CONFIG.NETWORK });
       this.aptos = new Aptos(this.config);
     }
+
+    async initializeAccounts(
+          organizer: Ed25519Account,
+          users: Ed25519Account[]
+        ): Promise<void> {
+          try {
+            console.log('🏦 Initializing accounts with initial balance...');
+            
+            await this.aptos.fundAccount({ 
+              accountAddress: organizer.accountAddress, 
+              amount: CONFIG.INITIAL_BALANCE 
+            });
+            
+            for (const user of users) {
+              await this.aptos.fundAccount({ 
+                accountAddress: user.accountAddress, 
+                amount: CONFIG.INITIAL_BALANCE 
+              });
+            }
+            
+            console.log('✅ All accounts initialized successfully');
+          } catch (error) {
+            throw new TicketingError('Failed to initialize accounts', error);
+          }
+        }
   
     private async waitWithRetry(hash: string): Promise<void> {
       for (let attempt = 1; attempt <= CONFIG.MAX_RETRIES; attempt++) {
@@ -73,301 +87,131 @@ import {
       }
     }
   
-    private async submitTransactionWithRetry(
-      signer: Ed25519Account,
-      transaction: any
-    ): Promise<string> {
-      let lastError;
-      
+    private async submitTransactionWithRetry(signer: Ed25519Account, transaction: any): Promise<string> {
       for (let attempt = 1; attempt <= CONFIG.MAX_RETRIES; attempt++) {
         try {
-          const committedTxn = await this.aptos.signAndSubmitTransaction({ 
-            signer, 
-            transaction 
-          });
-          
-          await this.waitWithRetry(committedTxn.hash);
-          return committedTxn.hash;
-        } catch (error: any) {
-          lastError = error;
-          
-          if (error?.data?.error_code === 'invalid_transaction_update') {
-            await new Promise(resolve => setTimeout(resolve, CONFIG.RETRY_DELAY * attempt));
-            continue;
-          }
-          
-          throw new TicketingError('Transaction submission failed', error);
+          const txn = await this.aptos.signAndSubmitTransaction({ signer, transaction });
+          await this.waitWithRetry(txn.hash);
+          return txn.hash;
+        } catch (error) {
+          console.error(`Transaction failed (Attempt ${attempt}):`, error);
+          if (attempt === CONFIG.MAX_RETRIES) throw new TicketingError("Max retry attempts reached", error);
+          await new Promise(resolve => setTimeout(resolve, CONFIG.RETRY_DELAY * attempt));
         }
       }
-      
-      throw new TicketingError('Max retry attempts reached', lastError);
+      throw new TicketingError("Unexpected error in transaction submission");
     }
   
     async printBalances(accounts: AccountInfo[]): Promise<void> {
-      try {
-        console.log('\nCurrent Balances:');
-        for (const { name, account } of accounts) {
-          const balance = await this.aptos.getAccountAPTAmount({ 
-            accountAddress: account.accountAddress 
-          });
+      console.log("\n🔍 Fetching account balances...");
+      for (const { name, account } of accounts) {
+        try {
+          const balance = await this.aptos.getAccountAPTAmount({ accountAddress: account.accountAddress });
           console.log(`${name} Balance: ${balance / 100_000_000} APT`);
+        } catch (error) {
+          console.error(`❌ Failed to fetch balance for ${name}:`, error);
         }
-        console.log();
-      } catch (error) {
-        throw new TicketingError('Failed to fetch account balances', error);
       }
     }
-  
     async mintTicketNFT(
-      creator: Ed25519Account,
-      collectionName: string,
-      ticketName: string,
-      ticketURI: string,
-      totalTickets: number
-    ): Promise<void> {
-      try {
-        console.log(`✅ Starting to mint ${totalTickets} ticket NFTs...`);
-        
+        creator: Ed25519Account,
+        collectionName: string,
+        ticketName: string,
+        ticketURI: string,
+        totalTickets: number
+      ): Promise<void> {
+        console.log(`\n🎟 Minting ${totalTickets} Ticket NFTs...`);
+      
         for (let i = 0; i < totalTickets; i++) {
           console.log(`Minting ticket ${i + 1} of ${totalTickets}...`);
-          
-          const mintTicketTxn = await this.aptos.mintDigitalAssetTransaction({
-            creator,
-            collection: collectionName,
-            description: "Access to VIP area.",
-            name: `${ticketName} #${i + 1}`,
-            uri: ticketURI,
-          });
-  
-          await this.submitTransactionWithRetry(creator, mintTicketTxn);
-          
-          if (i < totalTickets - 1) {
-            await new Promise(resolve => setTimeout(resolve, CONFIG.MINT_DELAY));
+      
+          try {
+            const mintTxn = await this.aptos.mintDigitalAssetTransaction({
+              creator,
+              collection: collectionName,
+              description: "Event Access Ticket",
+              name: `${ticketName} #${i + 1}`,
+              uri: ticketURI,
+            });
+      
+            await this.submitTransactionWithRetry(creator, mintTxn);
+            console.log(`✅ Ticket ${i + 1} minted successfully!`);
+            
+            if (i < totalTickets - 1) {
+              console.log(`⏳ Waiting for 1 seconds before minting the next ticket...`);
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
+      
+          } catch (error) {
+            console.error(`❌ Failed to mint Ticket ${i + 1}:`, error);
           }
         }
-  
-        console.log(`🎟 All ${totalTickets} Ticket NFTs minted successfully!`);
-      } catch (error) {
-        throw new TicketingError('Failed to mint ticket NFTs', error);
       }
-    }
+      
   
-    async buyTicket(
-      { buyer, seller, price }: BuyTicketParams
-    ): Promise<void> {
+    async createCollection(creator: Ed25519Account, collectionInfo: CollectionInfo): Promise<void> {
+      console.log("\n🎨 Creating NFT Collection...");
+  
       try {
-        console.log(`🛒 ${buyer.accountAddress} is buying a ticket from ${seller.accountAddress} for ${price / 100_000_000} APT`);
-  
-        const buyerBalance = await this.aptos.getAccountAPTAmount({ 
-          accountAddress: buyer.accountAddress 
-        });
-        
-        if (buyerBalance < price) {
-          throw new TicketingError('Insufficient funds for purchase');
-        }
-  
-        const paymentTxn = await this.aptos.transaction.build.simple({
-          sender: buyer.accountAddress,
-          data: {
-            function: "0x1::aptos_account::transfer",
-            functionArguments: [seller.accountAddress, price],
-          },
-        });
-  
-        await this.submitTransactionWithRetry(buyer, paymentTxn);
-  
-        const sellerTickets = await this.aptos.getOwnedDigitalAssets({ 
-          ownerAddress: seller.accountAddress 
-        });
-        
-        if (!sellerTickets.length) {
-          throw new TicketingError('Seller has no tickets available');
-        }
-  
-        const transferTicketTxn = await this.aptos.transferDigitalAssetTransaction({
-          sender: seller,
-          digitalAssetAddress: sellerTickets[0].token_data_id,
-          recipient: buyer.accountAddress,
-        });
-  
-        await this.submitTransactionWithRetry(seller, transferTicketTxn);
-        
-        console.log(`🎟 Ticket successfully transferred to ${buyer.accountAddress}`);
-      } catch (error) {
-        throw new TicketingError('Failed to complete ticket purchase', error);
-      }
-    }
-  
-    async resellTicket(
-      { seller, buyer, resalePrice, organizer }: ResellTicketParams
-    ): Promise<void> {
-      try {
-        if (resalePrice > CONFIG.MAX_RESALE_PRICE) {
-          throw new TicketingError(
-            `Resale price exceeds maximum allowed: ${CONFIG.MAX_RESALE_PRICE / 100_000_000} APT`
-          );
-        }
-  
-        const royaltyAmount = Math.floor((resalePrice * CONFIG.ROYALTY_PERCENTAGE) / 100);
-        const sellerAmount = resalePrice - royaltyAmount;
-  
-        console.log(
-          `🔄 ${seller.accountAddress} is reselling a ticket to ${buyer.accountAddress} ` +
-          `for ${resalePrice / 100_000_000} APT with ${CONFIG.ROYALTY_PERCENTAGE}% royalty`
-        );
-  
-        // Execute main sale
-        await this.buyTicket({ 
-          buyer, 
-          seller, 
-          price: sellerAmount 
-        });
-  
-        // Pay royalty to organizer
-        const royaltyTxn = await this.aptos.transaction.build.simple({
-          sender: buyer.accountAddress,
-          data: {
-            function: "0x1::aptos_account::transfer",
-            functionArguments: [organizer.accountAddress, royaltyAmount],
-          },
-        });
-  
-        await this.submitTransactionWithRetry(buyer, royaltyTxn);
-        console.log(`✅ Royalty of ${royaltyAmount / 100_000_000} APT paid to Organizer`);
-      } catch (error) {
-        throw new TicketingError('Failed to complete ticket resale', error);
-      }
-    }
-  
-    async createCollection(
-      creator: Ed25519Account,
-      collectionInfo: CollectionInfo
-    ): Promise<void> {
-      try {
-        const createCollectionTxn = await this.aptos.createCollectionTransaction({
+        const txn = await this.aptos.createCollectionTransaction({
           creator,
-          description: collectionInfo.description,
           name: collectionInfo.name,
           uri: collectionInfo.uri,
+          description: collectionInfo.description,
         });
   
-        await this.submitTransactionWithRetry(creator, createCollectionTxn);
-        console.log("🎨 Collection created successfully!");
+        await this.submitTransactionWithRetry(creator, txn);
+        console.log(`✅ Collection '${collectionInfo.name}' created successfully!`);
       } catch (error) {
-        throw new TicketingError('Failed to create collection', error);
-      }
-    }
-  
-    async initializeAccounts(
-      organizer: Ed25519Account,
-      users: Ed25519Account[]
-    ): Promise<void> {
-      try {
-        console.log('🏦 Initializing accounts with initial balance...');
-        
-        await this.aptos.fundAccount({ 
-          accountAddress: organizer.accountAddress, 
-          amount: CONFIG.INITIAL_BALANCE 
-        });
-        
-        for (const user of users) {
-          await this.aptos.fundAccount({ 
-            accountAddress: user.accountAddress, 
-            amount: CONFIG.INITIAL_BALANCE 
-          });
-        }
-        
-        console.log('✅ All accounts initialized successfully');
-      } catch (error) {
-        throw new TicketingError('Failed to initialize accounts', error);
+        console.error("❌ Failed to create collection:", error);
       }
     }
   }
   
+  // Main f
   async function main() {
-    try {
-      console.log("🎟 Starting NFT Ticketing System");
-      console.log("================================");
-      
-      const ticketing = new TicketingSystem();
-  
-      // Initialize accounts
-      console.log("\n1. Creating Accounts");
-      console.log("-------------------");
-      const organizer = Account.generate();
-      const users = [Account.generate(), Account.generate()];
-      await ticketing.initializeAccounts(organizer, users);
-  
-      // Print initial balances
-      const accounts: AccountInfo[] = [
-        { name: "Organizer", account: organizer },
-        ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user }))
-      ];
-      await ticketing.printBalances(accounts);
-  
-      // Create collection
-      console.log("\n2. Creating Ticket Collection");
-      console.log("--------------------------");
-      const collectionInfo: CollectionInfo = {
-        name: "Concert Tickets",
-        uri: "https://example.com/tickets",
-        description: "Exclusive event tickets."
-      };
-      await ticketing.createCollection(organizer, collectionInfo);
-  
-      // Mint tickets
-      console.log("\n3. Minting Tickets");
-      console.log("----------------");
-      await ticketing.mintTicketNFT(
-        organizer,
-        collectionInfo.name,
-        "VIP Ticket",
-        "https://example.com/vip-ticket",
-        5
-      );
-  
-      // Users buy tickets
-      console.log("\n4. Initial Ticket Sales");
-      console.log("---------------------");
-      await ticketing.buyTicket({ 
-        buyer: users[0], 
-        seller: organizer, 
-        price: CONFIG.TICKET_PRICE 
-      });
-      await ticketing.buyTicket({ 
-        buyer: users[1], 
-        seller: organizer, 
-        price: CONFIG.TICKET_PRICE 
-      });
-  
-      console.log("\nBalances after initial sales:");
-      await ticketing.printBalances(accounts);
-  
-      // Resell a ticket
-      console.log("\n5. Ticket Resale");
-      console.log("---------------");
-      await ticketing.resellTicket({
-        seller: users[0],
-        buyer: users[1],
-        resalePrice: 7_000_000,
-        organizer
-      });
-  
-      console.log("\nFinal Balances:");
-      await ticketing.printBalances(accounts);
-  
-    } catch (error) {
-      if (error instanceof TicketingError) {
-        console.error('\n❌ Ticketing system error:', error.message);
-        if (error.cause) {
-          console.error('Caused by:', error.cause);
-        }
-      } else {
-        console.error('\n❌ Unexpected error:', error);
-      }
-      process.exit(1);
-    }
+  try {
+    console.log("\n🎟 Starting NFT Ticketing System\n==============================");
+
+    const ticketing = new TicketingSystem();
+
+    console.log("\n1️⃣ Creating Accounts...");
+    const organizer = Account.generate();
+    const user = Account.generate();
+
+    const accounts: AccountInfo[] = [
+      { name: "Organizer", account: organizer },
+      { name: "User", account: user }
+    ];
+
+    // ✅ Fund accounts before proceeding
+    await ticketing.initializeAccounts(organizer, [user]);
+
+    await ticketing.printBalances(accounts);
+
+    console.log("\n2️⃣ Creating NFT Collection...");
+    const collectionInfo: CollectionInfo = {
+      name: "Event Tickets",
+      uri: "https://example.com/tickets",
+      description: "Exclusive access event tickets."
+    };
+
+    await ticketing.createCollection(organizer, collectionInfo);
+
+    console.log("\n3️⃣ Minting NFT Tickets...");
+    await ticketing.mintTicketNFT(organizer, collectionInfo.name, "VIP Ticket", "https://example.com/vip-ticket", 3);
+
+    console.log("\n4️⃣ Fetching User's NFTs...");
+    ticketing.fetchUserNFTs(user);
+
+    console.log("\n✅ NFT Ticketing System Execution Completed!");
+
+  } catch (error) {
+    console.error("❌ Unexpected error:", error);
+    process.exit(1);
   }
+}
+
   
   // Run the system
   main();
