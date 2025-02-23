@@ -311,6 +311,8 @@ class TicketingSystem {
           );
           const sellerAmount = resalePrice - royaltyAmount;
 
+          console.log('\n seller address type:',typeof seller.accountAddress);
+
           console.log(
               `🔄 ${seller.accountAddress} is reselling a ${ticketType} ticket to ${buyer.accountAddress
               } for ${resalePrice / 100_000_000} APT with ${CONFIG.ROYALTY_PERCENTAGE
@@ -410,6 +412,12 @@ async function main() {
           ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
       ];
       await ticketing.printBalances(accounts);
+
+      console.log('\n Organiser Account Address:', organizer.accountAddress);
+
+    //   console.log('\n account type: ', typeof organizer);
+
+      console.log('\n organiser:', organizer);
       
 
       // Create collection

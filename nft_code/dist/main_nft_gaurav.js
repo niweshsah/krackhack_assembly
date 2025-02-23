@@ -8,12 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Account, Aptos, AptosConfig, Network, } from "@aptos-labs/ts-sdk";
-// import {  } from "aptos";
 // =============== Constants ===============
 const CONFIG = {
     INITIAL_BALANCE: 100000000, // 1 APT
+    BALANCE_LOOP_INTERVAL: 10, // 10 APT 
     TICKET_PRICES: {
-        VIP: 10000000, // 0.10 APT for VIP tickets
+        VIP: 500000000, // 5 APT for VIP tickets
         NORMAL: 5000000, // 0.05 APT for normal tickets
     },
     MAX_RESALE_PRICES: {
@@ -21,7 +21,7 @@ const CONFIG = {
         NORMAL: 8000000, // 0.08 APT max resale for normal
     },
     ROYALTY_PERCENTAGE: 10, // 10%
-    NETWORK: Network.TESTNET,
+    NETWORK: Network.DEVNET,
     MAX_RETRIES: 3,
     RETRY_DELAY: 1000, // 1 second
     MINT_DELAY: 1000, // 1 second between mints
@@ -175,6 +175,7 @@ class TicketingSystem {
                 const buyerBalance = yield this.aptos.getAccountAPTAmount({
                     accountAddress: buyer.accountAddress,
                 });
+                console.log(`Buyer ${buyer.accountAddress} has a current balance: ${buyerBalance / 100000000} APT`);
                 if (buyerBalance < price) {
                     throw new InsufficientFundsError();
                 }
@@ -227,7 +228,6 @@ class TicketingSystem {
                 }
                 const royaltyAmount = Math.floor((resalePrice * CONFIG.ROYALTY_PERCENTAGE) / 100);
                 const sellerAmount = resalePrice - royaltyAmount;
-                console.log('\n seller address type:', typeof seller.accountAddress);
                 console.log(`🔄 ${seller.accountAddress} is reselling a ${ticketType} ticket to ${buyer.accountAddress} for ${resalePrice / 100000000} APT with ${CONFIG.ROYALTY_PERCENTAGE}% royalty`);
                 // Execute main sale
                 yield this.buyTicket({
@@ -272,15 +272,19 @@ class TicketingSystem {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log("🏦 Initializing accounts with initial balance...");
-                yield this.aptos.fundAccount({
-                    accountAddress: organizer.accountAddress,
-                    amount: CONFIG.INITIAL_BALANCE,
-                });
-                for (const user of users) {
+                for (let i = 0; i < CONFIG.BALANCE_LOOP_INTERVAL; i++) {
                     yield this.aptos.fundAccount({
-                        accountAddress: user.accountAddress,
+                        accountAddress: organizer.accountAddress,
                         amount: CONFIG.INITIAL_BALANCE,
                     });
+                }
+                for (const user of users) {
+                    for (let i = 0; i < CONFIG.BALANCE_LOOP_INTERVAL; i++) {
+                        yield this.aptos.fundAccount({
+                            accountAddress: user.accountAddress,
+                            amount: CONFIG.INITIAL_BALANCE,
+                        });
+                    }
                 }
                 console.log("✅ All accounts initialized successfully");
             }
@@ -309,9 +313,6 @@ function main() {
                 ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
             ];
             yield ticketing.printBalances(accounts);
-            console.log('\n Organiser Account Address:', organizer.accountAddress);
-            //   console.log('\n account type: ', typeof organizer);
-            console.log('\n organiser:', organizer);
             // Create collection
             console.log("\n2. Creating Ticket Collection");
             console.log("--------------------------");
