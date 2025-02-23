@@ -208,6 +208,7 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Plus, Trash2 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
+<<<<<<< HEAD
 import { createNewEvent } from './Actions/Event';
 import { TicketingSystem } from '../../nft_code/dist/main_nft_export';
 import Cookies from "js-cookie";
@@ -222,6 +223,38 @@ const EventCreationForm = () => {
   const [organiser, setOrganiser] = useState('');
   const [artist, setArtist] = useState('');
 
+=======
+import { createNewEvent } from './Actions/Event'
+// import TicketingSystem from '../../nft_code/dist/main_nft'
+import {TicketingSystem} from '../../nft_code/dist/main_nft_export'
+// import { AccountAddress } from '@aptos-labs/ts-sdk';
+
+function hexToUint8Array(hex) {
+  // Remove '0x' prefix if present
+  if (hex.startsWith("0x")) {
+      hex = hex.slice(2);
+  }
+
+  if (hex.length !== 64) {
+      throw new Error("Invalid hex address length. Expected 64 characters.");
+  }
+
+  const bytes = hex.match(/.{1,2}/g);
+  if (!bytes) {
+      throw new Error("Invalid hex string.");
+  }
+
+  return new Uint8Array(bytes.map(byte => parseInt(byte, 16)));
+}
+
+const EventCreationForm = ({address}) => {
+  const [eventData, setEventData] = useState({
+    image: '',
+    title: '',
+    Date_and_Time: { date: '', time: '' },
+    venue: '',
+  });
+>>>>>>> ecdb0048e3be76c541f90bba1b5f2796de4158ab
   const dispatch = useDispatch();
   const [tickets, setTickets] = useState([
     { category: '', price: 0, desc: '', seats_available: 0 }
@@ -246,11 +279,53 @@ const EventCreationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+<<<<<<< HEAD
     const token = Cookies.get("userToken"); // Retrieve token from cookies
 
     if (!token) {
       console.error("No token found! Please login.");
       return;
+=======
+    
+    // Dispatch Redux action to store event
+    dispatch(createNewEvent(eventData.image, eventData.title, eventData.Date_and_Time, tickets));
+  
+    try {
+      const ticketing = new TicketingSystem();
+  
+      console.log("\n2. Creating Ticket Collection");
+      console.log("--------------------------");
+  
+      const collectionInfo = {
+        name: eventData.title,
+        uri: "https://example.com/tickets-in-frontend",
+        description: `${eventData.Date_and_Time.date} ${eventData.Date_and_Time.time}`, // Ensure proper string format
+      };
+  
+      // const organizer = {
+      //   "AccountAddress" : address
+      //  } 
+      //  console.log(organizer)
+
+      console.log("\n Organiser Address before", address);
+
+      const organiserAccountAddress = hexToUint8Array(hexAddress);
+
+
+      const organizer =
+      {
+        "accountAddress": organiserAccountAddress
+      }
+
+      console.log("\n Organiser Address after", organizer);
+  
+      // Ensure the function is awaited
+      await ticketing.createCollection(organizer, collectionInfo);
+      console.log('Event Data:', eventData);
+      console.log('Tickets:', tickets);
+    } catch (error) {
+      console.error("Error creating ticket collection:", error);
+>>>>>>> ecdb0048e3be76c541f90bba1b5f2796de4158ab
     }
 
     const eventData = { image, title, date, time, venue, organiser, tickets, token };

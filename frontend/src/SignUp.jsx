@@ -4,29 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import {registerUser} from "./Actions/User"
 // import {loginUser} from "./Actions/User"
 import { Link } from 'react-router-dom';
-const SignUpWindow = () => { // singup to signin 
+const SignUpWindow = ({connectWallet,walletAddress}) => { // singup to signin 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [walletAddress, setWalletAddress] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const dispatch = useDispatch();
-  const connectWallet = async () => {
-    setIsConnecting(true);
-    try {
-      // Check if MetaMask is installed
-      if (typeof window.ethereum !== 'undefined') {
-        // Request account access
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        setWalletAddress(accounts[0]);
-      } else {
-        alert('Please install MetaMask to continue!');
-      }
-    } catch (error) {
-      console.error('Error connecting wallet:', error);
-    }
-    setIsConnecting(false);
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();

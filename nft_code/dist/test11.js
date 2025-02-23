@@ -21,7 +21,7 @@ const CONFIG = {
         NORMAL: 8000000, // 0.08 APT max resale for normal
     },
     ROYALTY_PERCENTAGE: 10, // 10%
-    NETWORK: Network.DEVNET,
+    NETWORK: Network.TESTNET,
     MAX_RETRIES: 3,
     RETRY_DELAY: 1000, // 1 second
     MINT_DELAY: 1000, // 1 second between mints
@@ -227,6 +227,7 @@ class TicketingSystem {
                 }
                 const royaltyAmount = Math.floor((resalePrice * CONFIG.ROYALTY_PERCENTAGE) / 100);
                 const sellerAmount = resalePrice - royaltyAmount;
+                console.log('\n seller address type:', typeof seller.accountAddress);
                 console.log(`🔄 ${seller.accountAddress} is reselling a ${ticketType} ticket to ${buyer.accountAddress} for ${resalePrice / 100000000} APT with ${CONFIG.ROYALTY_PERCENTAGE}% royalty`);
                 // Execute main sale
                 yield this.buyTicket({
@@ -308,8 +309,9 @@ function main() {
                 ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
             ];
             yield ticketing.printBalances(accounts);
-            console.log(`organizer's address is: ${organizer.accountAddress}`);
-            console.log('organizer: ', organizer);
+            console.log('\n Organiser Account Address:', organizer.accountAddress);
+            //   console.log('\n account type: ', typeof organizer);
+            console.log('\n organiser:', organizer);
             // Create collection
             console.log("\n2. Creating Ticket Collection");
             console.log("--------------------------");

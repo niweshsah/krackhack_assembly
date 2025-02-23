@@ -311,6 +311,8 @@ class TicketingSystem {
           );
           const sellerAmount = resalePrice - royaltyAmount;
 
+          console.log('\n seller address type:',typeof seller.accountAddress);
+
           console.log(
               `🔄 ${seller.accountAddress} is reselling a ${ticketType} ticket to ${buyer.accountAddress
               } for ${resalePrice / 100_000_000} APT with ${CONFIG.ROYALTY_PERCENTAGE
@@ -347,6 +349,8 @@ class TicketingSystem {
       collectionInfo: CollectionInfo
   ): Promise<void> {
       try {
+
+
           const createCollectionTxn = await this.aptos.createCollectionTransaction({
               creator,
               description: collectionInfo.description,
@@ -402,6 +406,8 @@ async function main() {
       console.log("-------------------");
       const organizer = Account.generate();
       const users = [Account.generate(), Account.generate()];
+
+
       await ticketing.initializeAccounts(organizer, users);
 
       // Print initial balances
@@ -409,7 +415,14 @@ async function main() {
           { name: "Organizer", account: organizer },
           ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
       ];
+      
       await ticketing.printBalances(accounts);
+
+      console.log('\n Organiser Account Address:', organizer.accountAddress);
+
+    //   console.log('\n account type: ', typeof organizer);
+
+      console.log('\n organiser:', organizer);
       
 
       // Create collection
