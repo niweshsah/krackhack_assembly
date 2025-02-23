@@ -11,8 +11,14 @@ import {
 // =============== Constants ===============
 const CONFIG = {
   INITIAL_BALANCE: 100_000_000, // 1 APT
-  TICKET_PRICE: 5_000_000, // 0.05 APT
-  MAX_RESALE_PRICE: 8_000_000, // 0.08 APT
+  TICKET_PRICES: {
+      VIP: 10_000_000,    // 0.10 APT for VIP tickets
+      NORMAL: 5_000_000,  // 0.05 APT for normal tickets
+  },
+  MAX_RESALE_PRICES: {
+      VIP: 15_000_000,    // 0.15 APT max resale for VIP
+      NORMAL: 8_000_000,  // 0.08 APT max resale for normal
+  },
   ROYALTY_PERCENTAGE: 10, // 10%
   NETWORK: Network.DEVNET,
   MAX_RETRIES: 3,
@@ -29,7 +35,6 @@ interface AccountInfo {
 interface BuyTicketParams {
   buyer: Ed25519Account;
   seller: Ed25519Account;
-  price: number;
   ticketType: string;
 }
 
@@ -209,8 +214,13 @@ class TicketingSystem {
       }
   }
 
-  async buyTicket({ buyer, seller, price, ticketType }: BuyTicketParams): Promise<void> {
+  async buyTicket({ buyer, seller, ticketType }: BuyTicketParams): Promise<void> {
       try {
+          const price = CONFIG.TICKET_PRICES[ticketType as keyof typeof CONFIG.TICKET_PRICES];
+          if (!price) {
+              throw new TicketingError(`Invalid ticket type: ${ticketType}`);
+          }
+
           console.log(
               `🛒 ${buyer.accountAddress} is buying a ${ticketType} ticket from ${seller.accountAddress
               } for ${price / 100_000_000} APT`
@@ -281,10 +291,14 @@ class TicketingSystem {
       ticketType,
   }: ResellTicketParams): Promise<void> {
       try {
-          if (resalePrice > CONFIG.MAX_RESALE_PRICE) {
+          const maxResalePrice = CONFIG.MAX_RESALE_PRICES[ticketType as keyof typeof CONFIG.MAX_RESALE_PRICES];
+          if (!maxResalePrice) {
+              throw new TicketingError(`Invalid ticket type: ${ticketType}`);
+          }
+
+          if (resalePrice > maxResalePrice) {
               throw new TicketingError(
-                  `Resale price exceeds maximum allowed: ${CONFIG.MAX_RESALE_PRICE / 100_000_000
-                  } APT`
+                  `Resale price exceeds maximum allowed for ${ticketType}: ${maxResalePrice / 100_000_000} APT`
               );
           }
 
@@ -294,7 +308,7 @@ class TicketingSystem {
           const sellerAmount = resalePrice - royaltyAmount;
 
           console.log(
-              `🔄 ${seller.accountAddress} is reselling a ticket to ${buyer.accountAddress
+              `🔄 ${seller.accountAddress} is reselling a ${ticketType} ticket to ${buyer.accountAddress
               } for ${resalePrice / 100_000_000} APT with ${CONFIG.ROYALTY_PERCENTAGE
               }% royalty`
           );
@@ -303,7 +317,6 @@ class TicketingSystem {
           await this.buyTicket({
               buyer,
               seller,
-              price: sellerAmount,
               ticketType,
           });
 
@@ -432,13 +445,11 @@ async function main() {
       await ticketing.buyTicket({
           buyer: users[0],
           seller: organizer,
-          price: CONFIG.TICKET_PRICE,
           ticketType: "VIP",
       });
       await ticketing.buyTicket({
           buyer: users[1],
           seller: organizer,
-          price: CONFIG.TICKET_PRICE,
           ticketType: "NORMAL",
       });
 
@@ -451,7 +462,7 @@ async function main() {
       await ticketing.resellTicket({
           seller: users[0],
           buyer: users[1],
-          resalePrice: 7_000_000,
+          resalePrice: 13_000_000, // Increased to be within VIP max resale price
           organizer,
           ticketType: "VIP",
       });

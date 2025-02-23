@@ -10,56 +10,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ts_sdk_1 = require("@aptos-labs/ts-sdk");
-// =============== Constants ===============
+// Constants
 const CONFIG = {
     INITIAL_BALANCE: 100000000, // 1 APT
-    TICKET_PRICES: {
-        VIP: 10000000, // 0.10 APT for VIP tickets
-        NORMAL: 5000000, // 0.05 APT for normal tickets
-    },
-    MAX_RESALE_PRICES: {
-        VIP: 15000000, // 0.15 APT max resale for VIP
-        NORMAL: 8000000, // 0.08 APT max resale for normal
-    },
+    TICKET_PRICE: 5000000, // 0.05 APT
+    MAX_RESALE_PRICE: 8000000, // 0.08 APT
     ROYALTY_PERCENTAGE: 10, // 10%
     NETWORK: ts_sdk_1.Network.DEVNET,
     MAX_RETRIES: 3,
     RETRY_DELAY: 1000, // 1 second
-    MINT_DELAY: 1000, // 1 second between mints
+    MINT_DELAY: 1000 // 1 second between mints
 };
-// =============== Custom Error Classes ===============
+// Custom error class
 class TicketingError extends Error {
     constructor(message, cause) {
         super(message);
         this.cause = cause;
-        this.name = "TicketingError";
+        this.name = 'TicketingError';
     }
 }
-class InsufficientFundsError extends TicketingError {
-    constructor(message = "Insufficient funds for transaction") {
-        super(message);
-        this.name = "InsufficientFundsError";
-    }
-}
-class NoTicketsAvailableError extends TicketingError {
-    constructor(message = "No tickets available") {
-        super(message);
-        this.name = "NoTicketsAvailableError";
-    }
-}
-class TransactionError extends TicketingError {
-    constructor(message, cause) {
-        super(message, cause);
-        this.name = "TransactionError";
-    }
-}
-// =============== Main Ticketing System Class ===============
 class TicketingSystem {
     constructor() {
         this.config = new ts_sdk_1.AptosConfig({ network: CONFIG.NETWORK });
         this.aptos = new ts_sdk_1.Aptos(this.config);
     }
-    // =============== Private Helper Methods ===============
     waitWithRetry(hash) {
         return __awaiter(this, void 0, void 0, function* () {
             for (let attempt = 1; attempt <= CONFIG.MAX_RETRIES; attempt++) {
@@ -68,10 +42,9 @@ class TicketingSystem {
                     return;
                 }
                 catch (error) {
-                    if (attempt === CONFIG.MAX_RETRIES) {
-                        throw new TransactionError("Transaction confirmation failed", error);
-                    }
-                    yield new Promise((resolve) => setTimeout(resolve, CONFIG.RETRY_DELAY * attempt));
+                    if (attempt === CONFIG.MAX_RETRIES)
+                        throw error;
+                    yield new Promise(resolve => setTimeout(resolve, CONFIG.RETRY_DELAY * attempt));
                 }
             }
         });
@@ -84,113 +57,147 @@ class TicketingSystem {
                 try {
                     const committedTxn = yield this.aptos.signAndSubmitTransaction({
                         signer,
-                        transaction,
+                        transaction
                     });
                     yield this.waitWithRetry(committedTxn.hash);
                     return committedTxn.hash;
                 }
                 catch (error) {
                     lastError = error;
-                    if (((_a = error === null || error === void 0 ? void 0 : error.data) === null || _a === void 0 ? void 0 : _a.error_code) === "invalid_transaction_update") {
-                        yield new Promise((resolve) => setTimeout(resolve, CONFIG.RETRY_DELAY * attempt));
+                    if (((_a = error === null || error === void 0 ? void 0 : error.data) === null || _a === void 0 ? void 0 : _a.error_code) === 'invalid_transaction_update') {
+                        yield new Promise(resolve => setTimeout(resolve, CONFIG.RETRY_DELAY * attempt));
                         continue;
                     }
-                    throw new TransactionError("Transaction submission failed", error);
+                    throw new TicketingError('Transaction submission failed', error);
                 }
             }
-            throw new TransactionError("Max retry attempts reached", lastError);
+            throw new TicketingError('Max retry attempts reached', lastError);
         });
     }
-    // =============== Public Methods ===============
     printBalances(accounts) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("\nCurrent Balances:");
+                console.log('\nCurrent Balances:');
                 for (const { name, account } of accounts) {
                     const balance = yield this.aptos.getAccountAPTAmount({
-                        accountAddress: account.accountAddress,
+                        accountAddress: account.accountAddress
                     });
                     console.log(`${name} Balance: ${balance / 100000000} APT`);
                 }
                 console.log();
             }
             catch (error) {
-                throw new TicketingError("Failed to fetch account balances", error);
+                throw new TicketingError('Failed to fetch account balances', error);
             }
         });
     }
-    mintTicketNFT(creator, collectionName, ticketName, ticketURI, totalTickets, ticketType) {
+    mintTicketNFT(creator, collectionName, ticketName, ticketURI, totalTickets) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log(`✅ Starting to mint ${totalTickets} ${ticketType} ticket NFTs...`);
+                console.log(`✅ Starting to mint ${totalTickets} ticket NFTs...`);
                 for (let i = 0; i < totalTickets; i++) {
                     console.log(`Minting ticket ${i + 1} of ${totalTickets}...`);
                     const mintTicketTxn = yield this.aptos.mintDigitalAssetTransaction({
                         creator,
                         collection: collectionName,
-                        description: ticketType,
+                        description: "Access to VIP area.",
                         name: `${ticketName} #${i + 1}`,
                         uri: ticketURI,
                     });
                     yield this.submitTransactionWithRetry(creator, mintTicketTxn);
                     if (i < totalTickets - 1) {
-                        yield new Promise((resolve) => setTimeout(resolve, CONFIG.MINT_DELAY));
+                        yield new Promise(resolve => setTimeout(resolve, CONFIG.MINT_DELAY));
                     }
                 }
                 console.log(`🎟 All ${totalTickets} Ticket NFTs minted successfully!`);
+                const tokens = yield this.viewAccountTokens(creator.accountAddress.toString());
+                // console.log('tokens by creator:', tokens);
             }
             catch (error) {
-                throw new TicketingError("Failed to mint ticket NFTs", error);
+                throw new TicketingError('Failed to mint ticket NFTs', error);
             }
         });
     }
-    viewAccountTokens(accountAddress, ticketType) {
+    viewTicketData(owner) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const tokens = yield this.aptos.getAccountOwnedTokens({ accountAddress });
-                if (tokens.length > 0) {
-                    const firstMatchingToken = tokens.find((token) => { var _a; return ((_a = token.current_token_data) === null || _a === void 0 ? void 0 : _a.description) === ticketType; });
-                    if (firstMatchingToken) {
-                        console.log(`\n🎟 First '${ticketType}' ticket found:`, firstMatchingToken);
-                        return firstMatchingToken;
-                    }
-                    console.log(`No '${ticketType}' tickets found for this account.`);
-                    return null;
-                }
-                console.log("No tokens found for this account.");
-                return null;
+                console.log(`Fetching ticket data for ${owner}...`);
+                const payload = {
+                    function: "0x1::token::get_token_data",
+                    functionArguments: [owner],
+                };
+                console.log(`Payload:`, payload);
+                const chainId = (yield this.aptos.view({ payload }))[0];
+                // return await this.aptos.view({ payload });
+                console.log(`Chain ID:`, chainId);
+                return chainId;
             }
             catch (error) {
-                throw new TicketingError("Failed to fetch account tokens", error);
+                throw new TicketingError('Failed to fetch ticket data', error);
+            }
+        });
+    }
+    fetchTokenMetadata(tokenDataId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                // Fetch the token data from the Aptos blockchain
+                console.log('tokenDataId-69:', tokenDataId);
+                const tokenData = yield this.aptos.getAccountResource({
+                    accountAddress: tokenDataId,
+                    resourceType: "0x3::token::TokenData",
+                });
+                console.log('tokenData:', tokenData);
+                // Extract metadata from the token data
+                const metadata = {
+                    name: tokenData.name,
+                    description: tokenData.description,
+                    uri: tokenData.uri, // URI pointing to the off-chain metadata (e.g., JSON file)
+                    properties: tokenData.properties, // Additional properties
+                };
+                return metadata;
+            }
+            catch (error) {
+                throw new TicketingError('Failed to fetch token metadata', error);
+            }
+        });
+    }
+    viewAccountTokens(accountAddress) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tokens = yield this.aptos.getAccountOwnedTokens({ accountAddress });
+            if (tokens.length > 0) {
+                console.log("First owned token:", tokens[0]);
+                return tokens[0]; // Return only the first token
+            }
+            else {
+                console.log("No tokens found for this account.");
+                return null;
             }
         });
     }
     buyTicket(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ buyer, seller, ticketType }) {
+        return __awaiter(this, arguments, void 0, function* ({ buyer, seller, price }) {
             try {
-                const price = CONFIG.TICKET_PRICES[ticketType];
-                if (!price) {
-                    throw new TicketingError(`Invalid ticket type: ${ticketType}`);
-                }
-                console.log(`🛒 ${buyer.accountAddress} is buying a ${ticketType} ticket from ${seller.accountAddress} for ${price / 100000000} APT`);
+                console.log(`🛒 ${buyer.accountAddress} is buying a ticket from ${seller.accountAddress} for ${price / 100000000} APT`);
+                // Check buyer's balance
                 const buyerBalance = yield this.aptos.getAccountAPTAmount({
-                    accountAddress: buyer.accountAddress,
+                    accountAddress: buyer.accountAddress
                 });
                 if (buyerBalance < price) {
-                    throw new InsufficientFundsError();
+                    throw new TicketingError('Insufficient funds for purchase');
                 }
+                // Fetch seller's tickets
                 const sellerTickets = yield this.aptos.getOwnedDigitalAssets({
-                    ownerAddress: seller.accountAddress,
+                    ownerAddress: seller.accountAddress
                 });
                 if (!sellerTickets.length) {
-                    throw new NoTicketsAvailableError();
+                    throw new TicketingError('Seller has no tickets available');
                 }
-                const firstMatchingToken = sellerTickets.find((token) => { var _a; return ((_a = token.current_token_data) === null || _a === void 0 ? void 0 : _a.description) === ticketType; });
-                if (!firstMatchingToken) {
-                    throw new NoTicketsAvailableError(`No ${ticketType} tickets available`);
-                }
-                const tokenDataId = firstMatchingToken.token_data_id;
-                // Execute payment transaction
+                // Get the first ticket's token data ID
+                const tokenDataId = sellerTickets[0].token_data_id;
+                console.log('\n');
+                console.log('tokenDataId:', tokenDataId);
+                console.log('\n');
+                // Proceed with the payment transaction
                 const paymentTxn = yield this.aptos.transaction.build.simple({
                     sender: buyer.accountAddress,
                     data: {
@@ -199,43 +206,37 @@ class TicketingSystem {
                     },
                 });
                 yield this.submitTransactionWithRetry(buyer, paymentTxn);
-                // Transfer ticket
+                // Transfer the ticket to the buyer
                 const transferTicketTxn = yield this.aptos.transferDigitalAssetTransaction({
                     sender: seller,
                     digitalAssetAddress: tokenDataId,
                     recipient: buyer.accountAddress,
                 });
                 yield this.submitTransactionWithRetry(seller, transferTicketTxn);
-                console.log(`🎟 ${ticketType} ticket successfully transferred to ${buyer.accountAddress}`);
+                console.log(`🎟 Ticket successfully transferred to ${buyer.accountAddress}`);
             }
             catch (error) {
-                if (error instanceof TicketingError) {
-                    throw error;
-                }
-                throw new TicketingError("Failed to complete ticket purchase", error);
+                throw new TicketingError('Failed to complete ticket purchase', error);
             }
         });
     }
     resellTicket(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ seller, buyer, resalePrice, organizer, ticketType, }) {
+        return __awaiter(this, arguments, void 0, function* ({ seller, buyer, resalePrice, organizer }) {
             try {
-                const maxResalePrice = CONFIG.MAX_RESALE_PRICES[ticketType];
-                if (!maxResalePrice) {
-                    throw new TicketingError(`Invalid ticket type: ${ticketType}`);
-                }
-                if (resalePrice > maxResalePrice) {
-                    throw new TicketingError(`Resale price exceeds maximum allowed for ${ticketType}: ${maxResalePrice / 100000000} APT`);
+                if (resalePrice > CONFIG.MAX_RESALE_PRICE) {
+                    throw new TicketingError(`Resale price exceeds maximum allowed: ${CONFIG.MAX_RESALE_PRICE / 100000000} APT`);
                 }
                 const royaltyAmount = Math.floor((resalePrice * CONFIG.ROYALTY_PERCENTAGE) / 100);
                 const sellerAmount = resalePrice - royaltyAmount;
-                console.log(`🔄 ${seller.accountAddress} is reselling a ${ticketType} ticket to ${buyer.accountAddress} for ${resalePrice / 100000000} APT with ${CONFIG.ROYALTY_PERCENTAGE}% royalty`);
+                console.log(`🔄 ${seller.accountAddress} is reselling a ticket to ${buyer.accountAddress} ` +
+                    `for ${resalePrice / 100000000} APT with ${CONFIG.ROYALTY_PERCENTAGE}% royalty`);
                 // Execute main sale
                 yield this.buyTicket({
                     buyer,
                     seller,
-                    ticketType,
+                    price: sellerAmount
                 });
-                // Pay royalty
+                // Pay royalty to organizer
                 const royaltyTxn = yield this.aptos.transaction.build.simple({
                     sender: buyer.accountAddress,
                     data: {
@@ -247,7 +248,7 @@ class TicketingSystem {
                 console.log(`✅ Royalty of ${royaltyAmount / 100000000} APT paid to Organizer`);
             }
             catch (error) {
-                throw new TicketingError("Failed to complete ticket resale", error);
+                throw new TicketingError('Failed to complete ticket resale', error);
             }
         });
     }
@@ -264,33 +265,32 @@ class TicketingSystem {
                 console.log("🎨 Collection created successfully!");
             }
             catch (error) {
-                throw new TicketingError("Failed to create collection", error);
+                throw new TicketingError('Failed to create collection', error);
             }
         });
     }
     initializeAccounts(organizer, users) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("🏦 Initializing accounts with initial balance...");
+                console.log('🏦 Initializing accounts with initial balance...');
                 yield this.aptos.fundAccount({
                     accountAddress: organizer.accountAddress,
-                    amount: CONFIG.INITIAL_BALANCE,
+                    amount: CONFIG.INITIAL_BALANCE
                 });
                 for (const user of users) {
                     yield this.aptos.fundAccount({
                         accountAddress: user.accountAddress,
-                        amount: CONFIG.INITIAL_BALANCE,
+                        amount: CONFIG.INITIAL_BALANCE
                     });
                 }
-                console.log("✅ All accounts initialized successfully");
+                console.log('✅ All accounts initialized successfully');
             }
             catch (error) {
-                throw new TicketingError("Failed to initialize accounts", error);
+                throw new TicketingError('Failed to initialize accounts', error);
             }
         });
     }
 }
-// =============== Main Function ===============
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -306,7 +306,7 @@ function main() {
             // Print initial balances
             const accounts = [
                 { name: "Organizer", account: organizer },
-                ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user })),
+                ...users.map((user, index) => ({ name: `User ${index + 1}`, account: user }))
             ];
             yield ticketing.printBalances(accounts);
             // Create collection
@@ -315,61 +315,53 @@ function main() {
             const collectionInfo = {
                 name: "Concert Tickets",
                 uri: "https://example.com/tickets",
-                description: "Exclusive event tickets.",
+                description: "Exclusive event tickets."
             };
             yield ticketing.createCollection(organizer, collectionInfo);
-            // Mint VIP tickets
-            console.log("\n3.a Minting VIP Tickets");
+            // Mint tickets
+            console.log("\n3. Minting Tickets");
             console.log("----------------");
-            yield ticketing.mintTicketNFT(organizer, collectionInfo.name, "tickets for event", "https://example.com/vip-ticket", 2, "VIP");
-            // Mint normal tickets
-            console.log("\n3.b Minting Normal Tickets");
-            console.log("----------------");
-            yield ticketing.mintTicketNFT(organizer, collectionInfo.name, "tickets for event", "https://example.com/normal-ticket", 2, "NORMAL");
-            // Initial ticket sales
+            yield ticketing.mintTicketNFT(organizer, collectionInfo.name, "VIP Ticket", "https://example.com/vip-ticket", 2);
+            // Users buy tickets
             console.log("\n4. Initial Ticket Sales");
             console.log("---------------------");
             yield ticketing.buyTicket({
                 buyer: users[0],
                 seller: organizer,
-                ticketType: "VIP",
+                price: CONFIG.TICKET_PRICE
             });
             yield ticketing.buyTicket({
                 buyer: users[1],
                 seller: organizer,
-                ticketType: "NORMAL",
+                price: CONFIG.TICKET_PRICE
             });
             console.log("\nBalances after initial sales:");
             yield ticketing.printBalances(accounts);
-            // Resell ticket
+            // Resell a ticket
             console.log("\n5. Ticket Resale");
             console.log("---------------");
             yield ticketing.resellTicket({
                 seller: users[0],
                 buyer: users[1],
-                resalePrice: 13000000, // Increased to be within VIP max resale price
-                organizer,
-                ticketType: "VIP",
+                resalePrice: 7000000,
+                organizer
             });
             console.log("\nFinal Balances:");
             yield ticketing.printBalances(accounts);
         }
         catch (error) {
             if (error instanceof TicketingError) {
-                console.error("\n❌ Ticketing system error:", error.message);
+                console.error('\n❌ Ticketing system error:', error.message);
                 if (error.cause) {
-                    console.error("Caused by:", error.cause);
+                    console.error('Caused by:', error.cause);
                 }
             }
             else {
-                console.error("\n❌ Unexpected error:", error);
+                console.error('\n❌ Unexpected error:', error);
             }
             process.exit(1);
         }
     });
 }
 // Run the system
-main().catch((error) => {
-    console.error("Fatal error:", error);
-    process.exit(1);
-});
+main();

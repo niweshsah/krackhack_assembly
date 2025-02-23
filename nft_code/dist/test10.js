@@ -13,14 +13,8 @@ const ts_sdk_1 = require("@aptos-labs/ts-sdk");
 // =============== Constants ===============
 const CONFIG = {
     INITIAL_BALANCE: 100000000, // 1 APT
-    TICKET_PRICES: {
-        VIP: 10000000, // 0.10 APT for VIP tickets
-        NORMAL: 5000000, // 0.05 APT for normal tickets
-    },
-    MAX_RESALE_PRICES: {
-        VIP: 15000000, // 0.15 APT max resale for VIP
-        NORMAL: 8000000, // 0.08 APT max resale for normal
-    },
+    TICKET_PRICE: 5000000, // 0.05 APT
+    MAX_RESALE_PRICE: 8000000, // 0.08 APT
     ROYALTY_PERCENTAGE: 10, // 10%
     NETWORK: ts_sdk_1.Network.DEVNET,
     MAX_RETRIES: 3,
@@ -166,12 +160,8 @@ class TicketingSystem {
         });
     }
     buyTicket(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ buyer, seller, ticketType }) {
+        return __awaiter(this, arguments, void 0, function* ({ buyer, seller, price, ticketType }) {
             try {
-                const price = CONFIG.TICKET_PRICES[ticketType];
-                if (!price) {
-                    throw new TicketingError(`Invalid ticket type: ${ticketType}`);
-                }
                 console.log(`🛒 ${buyer.accountAddress} is buying a ${ticketType} ticket from ${seller.accountAddress} for ${price / 100000000} APT`);
                 const buyerBalance = yield this.aptos.getAccountAPTAmount({
                     accountAddress: buyer.accountAddress,
@@ -219,20 +209,17 @@ class TicketingSystem {
     resellTicket(_a) {
         return __awaiter(this, arguments, void 0, function* ({ seller, buyer, resalePrice, organizer, ticketType, }) {
             try {
-                const maxResalePrice = CONFIG.MAX_RESALE_PRICES[ticketType];
-                if (!maxResalePrice) {
-                    throw new TicketingError(`Invalid ticket type: ${ticketType}`);
-                }
-                if (resalePrice > maxResalePrice) {
-                    throw new TicketingError(`Resale price exceeds maximum allowed for ${ticketType}: ${maxResalePrice / 100000000} APT`);
+                if (resalePrice > CONFIG.MAX_RESALE_PRICE) {
+                    throw new TicketingError(`Resale price exceeds maximum allowed: ${CONFIG.MAX_RESALE_PRICE / 100000000} APT`);
                 }
                 const royaltyAmount = Math.floor((resalePrice * CONFIG.ROYALTY_PERCENTAGE) / 100);
                 const sellerAmount = resalePrice - royaltyAmount;
-                console.log(`🔄 ${seller.accountAddress} is reselling a ${ticketType} ticket to ${buyer.accountAddress} for ${resalePrice / 100000000} APT with ${CONFIG.ROYALTY_PERCENTAGE}% royalty`);
+                console.log(`🔄 ${seller.accountAddress} is reselling a ticket to ${buyer.accountAddress} for ${resalePrice / 100000000} APT with ${CONFIG.ROYALTY_PERCENTAGE}% royalty`);
                 // Execute main sale
                 yield this.buyTicket({
                     buyer,
                     seller,
+                    price: sellerAmount,
                     ticketType,
                 });
                 // Pay royalty
@@ -332,11 +319,13 @@ function main() {
             yield ticketing.buyTicket({
                 buyer: users[0],
                 seller: organizer,
+                price: CONFIG.TICKET_PRICE,
                 ticketType: "VIP",
             });
             yield ticketing.buyTicket({
                 buyer: users[1],
                 seller: organizer,
+                price: CONFIG.TICKET_PRICE,
                 ticketType: "NORMAL",
             });
             console.log("\nBalances after initial sales:");
@@ -347,7 +336,7 @@ function main() {
             yield ticketing.resellTicket({
                 seller: users[0],
                 buyer: users[1],
-                resalePrice: 13000000, // Increased to be within VIP max resale price
+                resalePrice: 7000000,
                 organizer,
                 ticketType: "VIP",
             });
