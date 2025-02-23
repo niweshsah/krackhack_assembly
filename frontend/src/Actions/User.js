@@ -1,18 +1,31 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-export const loginUser = async (email, password) => {
+export const loginUser = (email, password) => async (dispatch) => {
   try {
-    const response = await axios.post("http://localhost:5000/api/v1/login", { email, password });
+    dispatch({
+      type: "LoginRequest",
+    });
 
-    if (response.data?.token) {
-      Cookies.set("userToken", response.data.token, { expires: 90, secure: true, sameSite: "Strict" });
-      return { success: true, message: "Login successful!" };
-    } else {
-      return { success: false, message: "Invalid response from server" };
-    }
+    const { data } = await axios.post(
+      "http://localhost:5000/api/v1/login",
+      { email, password },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    dispatch({
+      type: "LoginSuccess",
+      payload: data.user,
+    });
   } catch (error) {
-    return { success: false, message: error.response?.data?.message || "Login failed" };
+    dispatch({
+      type: "LoginFailure",
+      payload: error.response.data.message,
+    });
   }
 };
 export const loadUser = () => async (dispatch) => {

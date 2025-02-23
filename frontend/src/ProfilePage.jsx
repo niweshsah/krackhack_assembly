@@ -13,10 +13,11 @@ const ProfileDashboard = () => {
   // }, [dispatch]);
   
   const { user } = useSelector((state) => state.user);
+  
   const userProfile = {
     name: user.name,
     age: 28,
-    walletAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+    walletAddress: user.walletId,
     totalEventsOrganized: user.events_organised.length,
     totalTicketsPurchased: user.events_attended.length,
   };
@@ -29,6 +30,7 @@ const ProfileDashboard = () => {
     }
   }, [user]);
   // const upcomingTickets = loop 
+  
   const upcomingTickets = [
     {
       id: 1,

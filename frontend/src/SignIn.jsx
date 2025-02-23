@@ -8,11 +8,11 @@ const SignInWindow = () => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(loginUser(email, password));
     // const res = await loginUser(email, password);
-    console.log('Signing in with:', { email, password, res });
+    console.log('Signing in with:', { email, password});
   };
 
   return (
