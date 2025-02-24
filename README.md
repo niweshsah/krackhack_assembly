@@ -4,6 +4,9 @@
 
 TicketChain is a blockchain-based event ticketing system that mints tickets as NFTs, ensuring authenticity, preventing fraud, and enabling a fair secondary marketplace with price controls and royalties for organizers.
 
+## Our video link:
+[Video Link](https://www.loom.com/share/2374c7c8bc7e4031ae2d32c1a4d41f0a?sid=f680aa31-6168-4ea8-8213-5fcc212cd4dd)
+
 ---
 
 ## Table of Contents
@@ -223,3 +226,4 @@ To execute the contract, follow these steps:
 4. User Experience:
 
     - Added tooltips and guides for non-crypto users.
+      
