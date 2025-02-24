@@ -350,6 +350,7 @@ import { TicketingSystem } from '../../nft_code/dist/main_nft_export';
 
 const ticketing = new TicketingSystem(); // Keep this outside to avoid re-instantiating
 
+
 const EventCreationForm = () => {
   const [image, setImage] = useState('');
   const [title, setTitle] = useState('');
@@ -387,15 +388,17 @@ const EventCreationForm = () => {
     // }
 
     try {
-      console.log("Creating Ticket Collection...");
+      console.log("Creating Ticket Collection..fsdf.");
 
-      await ticketing.func(title);
-      
+      await ticketing.func(title,tickets);
+      console.log(tickets);
       dispatch(createNewEvent({ title, date, time, venue, organiser, artist, tickets }));
       console.log("Event successfully created!");
     } catch (error) {
       console.error("Error creating event:", error);
     }
+
+    
   };
 
   return (

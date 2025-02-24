@@ -4,6 +4,9 @@ import { getEvents } from './Actions/Event';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AptosClient } from 'aptos';
+import { TicketingSystem } from '../../nft_code/dist/main_nft_export';
+
+const ticketing = new TicketingSystem(); // Keep this outside to avoid re-instantiating
 
 const EventListing = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
@@ -40,7 +43,7 @@ const EventListing = () => {
       reviews: [],
     },
   ];
-
+  
   useEffect(() => {
     dispatch(getEvents());
   }, [dispatch]);
@@ -101,21 +104,20 @@ const EventListing = () => {
   const TicketPurchaseModal = ({ event, onClose }) => {
     const [selectedTicket, setSelectedTicket] = useState(event.tickets[0]);
     const [quantity, setQuantity] = useState(1);
-
+    const receiverAddress = event.organiser
     const basePrice = parseInt(selectedTicket?.price) || 0;
     const total = basePrice * quantity;
     const serviceFee = total * 0.1;
     const finalTotal = total + serviceFee;
 
-    const handlePayment = async () => {
+    const handlePayment = async (receiverAddress) => {
       setLoading(true);
       try {
-        const hash = await transfer("0xb5f96a6656d1b7353ea188666db490bdd9091ae7a987a75432e8c742c1995253", finalTotal);
+        const hash = await transfer(receiverAddress, finalTotal);
         setTransactionHash(hash);
         setTransactionSuccess(true);
-      } catch (error) {
-        alert("❌ Transfer failed. Please try again.");
-      } finally {
+      } 
+       finally {
         setLoading(false);
       }
     };
@@ -212,8 +214,8 @@ const EventListing = () => {
               </div>
 
               <button 
-                onClick={handlePayment} 
-                disabled={loading}
+                onClick={handlePayment(receiverAddress)} 
+                // disabled={loading}
                 className="w-full py-4 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-all duration-300 flex items-center justify-center space-x-2"
               >
                 <CreditCard className="w-5 h-5" />
@@ -226,7 +228,13 @@ const EventListing = () => {
     );
   };
 
-  const SuccessModal = ({ hash, onClose }) => {
+  const SuccessModal = async ({ addr, onClose }) => {
+    // console.log('func2 f');
+
+    // await ticketing.func2(receiverAddress);
+    // console.log('func2 s');
+
+
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-lg flex items-center justify-center z-50 p-4">
         <div className="bg-gray-900 rounded-2xl max-w-md w-full p-6 text-center">

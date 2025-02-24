@@ -184,11 +184,18 @@ export class TicketingSystem {
                 if (!sellerTickets.length) {
                     throw new NoTicketsAvailableError();
                 }
-                const firstMatchingToken = sellerTickets.find((token) => { var _a; return ((_a = token.current_token_data) === null || _a === void 0 ? void 0 : _a.description) === ticketType; });
-                if (!firstMatchingToken) {
-                    throw new NoTicketsAvailableError(`No ${ticketType} tickets available`);
-                }
+                // const firstMatchingToken = sellerTickets.find((token) => { var _a; return ((_a = token.current_token_data) === null || _a === void 0 ? void 0 : _a.description) === ticketType; });
+                // if (!firstMatchingToken) {
+                //     throw new NoTicketsAvailableError(`No ${ticketType} tickets available`);
+                // }
+                // const tokenDataId = firstMatchingToken.token_data_id
+                
+
+                const firstMatchingToken = sellerTickets[0];
+                // selling first tickets
+
                 const tokenDataId = firstMatchingToken.token_data_id;
+
                 // Execute payment transaction
                 //   const paymentTxn = await this.aptos.transaction.build.simple({
                 //       sender: buyer.accountAddress,
@@ -198,13 +205,18 @@ export class TicketingSystem {
                 //       },
                 //   });
                 //   await this.submitTransactionWithRetry(buyer, paymentTxn);
+
                 console.log('\n sahu will give payment code');
+
+
                 // Transfer ticket
                 const transferTicketTxn = yield this.aptos.transferDigitalAssetTransaction({
                     sender: seller,
                     digitalAssetAddress: tokenDataId,
                     recipient: buyerAddress,
                 });
+
+
                 yield this.submitTransactionWithRetry(seller, transferTicketTxn);
                 console.log(`🎟 ${ticketType} ticket successfully transferred to ${buyerAddress}`);
             }
@@ -257,12 +269,15 @@ export class TicketingSystem {
             try {
                 console.log('name: ', collectionInfo.name);
                 console.log('creator: ',creator);
+
                 const createCollectionTxn = yield this.aptos.createCollectionTransaction({
                     creator,
                     description: collectionInfo.description,
                     name: collectionInfo.name,
                     uri: collectionInfo.uri,
                 });
+
+                console.log("abcd");
                 yield this.submitTransactionWithRetry(creator, createCollectionTxn);
                 console.log("🎨 Collection created successfully!");
             }
@@ -292,7 +307,32 @@ export class TicketingSystem {
             }
         });
     }
-    func(title) {
+
+    func2(buyerAddress)
+    {
+        return __awaiter(this, void 0, void 0, function* () {
+
+            console.log('func2 running');
+
+            const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+            const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
+
+            console.log("\n4. Initial Ticket Sales");
+            console.log("---------------------");
+            yield ticketing.buyTicket({
+                buyerAddress: buyerAddress,
+                seller: organizer,
+                ticketType: "VIP",
+            });
+
+
+
+        });
+
+       
+    }
+
+    func(title , tickets) {
         return __awaiter(this, void 0, void 0, function* () {
             const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
             const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
@@ -312,7 +352,7 @@ export class TicketingSystem {
             //   console.log('\n account type: ', typeof organizer);
             //   console.log('\n organiser:', organizer);
             // Create collection
-            console.log("\n2. Creating Ticket Collection");
+            console.log("\n2. Creating Ticket Collection 456456");
             console.log("--------------------------");
             console.log("title: ", title);
             const collectionInfo = {
@@ -323,15 +363,31 @@ export class TicketingSystem {
             yield this.createCollection(organizer, collectionInfo);
 
 
+            
             console.log("\n3.a Minting VIP Tickets");
             console.log("----------------");
-            yield this.mintTicketNFT(organizer, collectionInfo.name, "tickets for event", "https://example.com/vip-ticket", 2, "VIP");
-            // Mint normal tickets
-            console.log("\n3.b Minting Normal Tickets");
-            console.log("----------------");
-            yield this.mintTicketNFT(organizer, collectionInfo.name, "tickets for event", "https://example.com/normal-ticket", 2, "NORMAL");
-            // Initial ticket sales
+            // yield this.mintTicketNFT(organizer, collectionInfo.name, "tickets for event", "https://example.com/vip-ticket", 2, "VIP");
 
+            for (const ticket of tickets) {
+                yield this.mintTicketNFT(
+                  organizer,
+                  collectionInfo.name,
+                  ticket.description,
+                  "https://example.com/ticket-image", // You can replace this dynamically
+                  ticket.seats_available, // Number of tickets to mint
+                  ticket.category // Ticket category
+                );
+                console.log(`Minted ${ticket.seats_available} NFTs for category: ${ticket.category}`);
+              }
+
+
+
+
+            // Mint normal tickets
+            // console.log("\n3.b Minting Normal Tickets");
+            // console.log("----------------");
+            // yield this.mintTicketNFT(organizer, collectionInfo.name, "tickets for event", "https://example.com/normal-ticket", 2, "NORMAL");
+            // Initial ticket sales
 
 
         });
@@ -342,7 +398,7 @@ export class TicketingSystem {
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log("🎟 Starting NFT Ticketing System");
+            console.log("🎟 Starting NFT Ticketing System fgrfdg");
             console.log("================================");
             const ticketing = new TicketingSystem();
             // Initialize accounts
@@ -430,16 +486,16 @@ function main() {
 }
 
 
-// Run the system
-main().catch((error) => {
-    console.error("Fatal error:", error);
-    process.exit(1);
-});
+// // Run the system
+// main().catch((error) => {
+//     console.error("Fatal error:", error);
+//     process.exit(1);
+// });
 
 
-const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
-const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
+// const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
+// const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
 
-export const ORGANIZER_ACCOUNT = {
-    organizer1: organizer
-};
+// export const ORGANIZER_ACCOUNT = {
+//     organizer1: organizer
+// };

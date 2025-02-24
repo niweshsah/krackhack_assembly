@@ -1,4 +1,3 @@
-import React from 'react';  // Ensure React is imported
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
@@ -8,7 +7,10 @@ import EventCreationForm from './CreateEvent';
 import ProfileDashboard from './ProfilePage';
 import SignInWindow from './SignIn';
 import SignUpWindow from './SignUp';
+import React, { useState, useEffect } from 'react';
+import { PetraWallet } from 'petra-plugin-wallet-adapter';
 import { useSelector } from 'react-redux';
+
 function App() {
   const [wallet, setWallet] = useState(null);
   const [walletAddress, setWalletAddress] = useState("");
@@ -22,7 +24,7 @@ function App() {
   }, [walletAddress]);
 
   const petraWallet = new PetraWallet();
-
+  
   const connectWallet = async () => {
     setIsLoading(true);
     setError(null);
@@ -174,15 +176,7 @@ function App() {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/event" element={<EventListing />} />
-            <Route path="/signin" element={isAuthenticated ? <HomePage /> : <SignInWindow />} />
-
-            <Route
-              path="/profile"
-              element={isAuthenticated ? <ProfileDashboard /> : <SignUpWindow />}
-            />
-
-
+            <Route path="/signin" element={<SignInWindow />} />
             <Route
               path="/signup"
               element={
@@ -193,7 +187,8 @@ function App() {
                 )
               }
             />
-
+            <Route path="/profile" element={<ProfileDashboard />} />
+            <Route path="/event" element={<EventListing />} />
             <Route path="/organize" element={<EventCreationForm address={walletAddress} />} />
           </Routes>
         </div>

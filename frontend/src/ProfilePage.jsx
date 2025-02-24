@@ -13,7 +13,7 @@ const ProfileDashboard = () => {
   // }, [dispatch]);
   
   const { user } = useSelector((state) => state.user);
-  
+
   const userProfile = {
     name: user.name,
     age: 28,
@@ -32,51 +32,11 @@ const ProfileDashboard = () => {
   // const upcomingTickets = loop 
   
   const upcomingTickets = [
-    {
-      id: 1,
-      eventName: "Summer Night Festival",
-      date: "2025-06-15",
-      time: "20:00",
-      venue: "Neon Garden Arena",
-      ticketType: "VIP",
-      ticketId: "#NFT-789",
-      price: 150,
-    },
-    {
-      id: 2,
-      eventName: "Electric Dreams Party",
-      date: "2025-07-01",
-      time: "21:00",
-      venue: "Cyber Club Downtown",
-      ticketType: "Premium",
-      ticketId: "#NFT-790",
-      price: 120,
-    }
+    
   ];
   
   const organizedEvents = [
-    {
-      id: 1,
-      name: "Blockchain Beats",
-      date: "2025-08-15",
-      time: "22:00",
-      venue: "Digital Arena",
-      totalTickets: 500,
-      soldTickets: 320,
-      revenue: 32000,
-      status: "Active"
-    },
-    {
-      id: 2,
-      name: "Crypto Concert",
-      date: "2025-09-01",
-      time: "20:00",
-      venue: "Meta Stadium",
-      totalTickets: 1000,
-      soldTickets: 750,
-      revenue: 75000,
-      status: "Active"
-    }
+   
   ];
 
   const copyToClipboard = (text) => {
