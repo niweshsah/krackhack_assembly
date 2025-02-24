@@ -47,8 +47,8 @@ TicketChain is a blockchain-based event ticketing system that mints tickets as N
 ### Steps
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/your-username/TicketChain.git
-   cd TicketChain
+   git clone https://github.com/niweshsah/krackhack_assembly.git
+   cd krackhack_assembly/
    ```
 2. Install Dependencies
     ```bash
@@ -85,7 +85,6 @@ TicketChain is a blockchain-based event ticketing system that mints tickets as N
 
     ```bash
     cd frontend/
-    npm start
     npm run dev
     cd ..
     cd backend/
@@ -93,7 +92,7 @@ TicketChain is a blockchain-based event ticketing system that mints tickets as N
     ```
 6. Access the Application:
 
-    Open http://localhost:3000 in your browser.
+    Open http://localhost:3000 or other in your browser.
 
 ## Usage 🎮
 ### For Event Organizers
