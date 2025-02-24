@@ -70,18 +70,9 @@ TicketChain is a blockchain-based event ticketing system that mints tickets as N
     
     ```bash
     aptos init --network testnet
-    ```
+    ``
 
-4. Deploy the Smart Contract:
-
-  - Compile and deploy the Move smart contract:
-    
-    ```bash
-    aptos move compile
-    aptos move publish --named-addresses EventTicketing=0x1
-    ```
-
-5. Run the Frontend:
+4. Run the Frontend:
 
     ```bash
     cd frontend/
@@ -90,7 +81,8 @@ TicketChain is a blockchain-based event ticketing system that mints tickets as N
     cd backend/
     node server.js
     ```
-6. Access the Application:
+    
+5. Access the Application:
 
     Open http://localhost:3000 or other in your browser.
 
