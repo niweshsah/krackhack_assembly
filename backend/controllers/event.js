@@ -11,80 +11,15 @@ cloudinary.config({
 
 exports.createEvent = async (req, res) => {
   try {
-    // console.log("bye")
-    // const { image, title, date , time, venue, tickets , organiser } = req.body;
-    // Validate required fields
-    // console.log(title , date , time , venue , organiser)
-    // if (!image || !title || !date || !time || !venue || !Array.isArray(tickets) || tickets.length === 0) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Image, title, date/time, and at least one ticket category are required",
-    //   });
-    // }
-    const {title,tickets,date,time,venue,organiser} = req.body;
-    const event = await Event.create({title,tickets,date,time,venue,organiser});
-    // Validate each ticket category
-    // for (const ticket of tickets) {
-    //   if (
-
-    //     typeof ticket.category !== "string" ||
-    //     typeof ticket.price !== "number" ||
-    //     typeof ticket.desc !== "string" ||
-    //     typeof ticket.seats_available !== "number"
-
-    //   ) {
-    //     return res.status(400).json({
-    //       success: false,
-    //       message: "Each ticket must have a valid category (Number), price (String), description (String), and seats_available (Number)",
-    //     });
-    //   }
-
-    //   if (ticket.seats_available <= 0) {
-    //     return res.status(400).json({
-    //       success: false,
-    //       message: `Seats available for category ${ticket.category} must be at least 1`,
-    //     });
-    //   }
-    // }
-
-    // Upload image to Cloudinary
-    // const myCloud = await cloudinary.uploader.upload(image, {
-    //   folder: "debates",
-    // });
-
-    // Prepare event data
-    // const newEventData = {
-    //   title: title,
-    //   date ,
-    //   time,
-    //   venue,
-    //   organiser,
-    //   isFinish: false,
-    //   tickets, // Store ticket details in the event
-    // };
-
-    // Create event in the database
-    // const event = await Event.create({title,date,image,time,venue,organiser,tickets});
-
-    // Find the organiser
-    // const user = await User.findById(req.user._id);
-    // if (!user) {
-    //   return res.status(404).json({
-    //     success: false,
-    //     message: "User not found",
-    //   });
-    // }
-
-    // Add event to user's organised events
-    // if (!user.events_organised) {
-    //   user.events_organised = [];
-    // }
-    // user.events_organised.push(event._id);
-
-    // await user.save();
-    // await event.save();
-
-    // Respond with success
+    const {image , title , date, time, venue, organiser, tickets} = req.body;
+    console.log(title);
+    console.log(tickets);
+    console.log(date);
+    console.log(image);
+    console.log("...................................")
+    const Title = title;
+    const event = await Event.create({image , Title , date, time, venue, organiser, tickets});
+    console.log(event);
     res.status(201).json({
       success: true,
       message: "Event created successfully",

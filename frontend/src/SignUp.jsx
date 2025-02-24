@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {registerUser} from "./Actions/User"
 // import {loginUser} from "./Actions/User"
 import { Link } from 'react-router-dom';
-const SignUpWindow = ({connectWallet,walletAddress}) => { // singup to signin 
+const SignUpWindow = ({setEmai,connectWallet,walletAddress}) => { // singup to signin 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,6 +13,7 @@ const SignUpWindow = ({connectWallet,walletAddress}) => { // singup to signin
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(walletAddress);
     dispatch(registerUser(name,email,password,walletAddress));
     // Handle sign in logic here
     console.log('Signing in with:', { name, walletAddress });
@@ -57,7 +58,7 @@ const SignUpWindow = ({connectWallet,walletAddress}) => { // singup to signin
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {setEmail(e.target.value);setEmai(e.target.value)}}
                     className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 pl-12 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
                     placeholder="Enter your email"
                   />

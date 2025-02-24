@@ -76,10 +76,13 @@ export const createNewEvent = (image, title, date, time, venue, organiser, ticke
         dispatch({
             type: "newEventRequest",
         });
+        
+        console.log(title);
+        console.log("--------------------------------------------------------");
         // const { data } = await axios.get(`/api/v1/post/${id}`);
         const { data } = await axios.post(
             "http://localhost:5000/api/v1/event/create",
-            { image, title, date, time, venue, organiser, tickets},
+            { image, title, date, time, venue, organiser,tickets},
             {
                 headers: {
                     "Content-Type": "application/json",

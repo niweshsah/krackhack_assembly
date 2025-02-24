@@ -18,7 +18,7 @@ function App() {
   const [collectionCreated, setCollectionCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const[email,setEmail] = useState("");
   useEffect(() => {
     console.log("Wallet Address:", walletAddress);
   }, [walletAddress]);
@@ -176,18 +176,19 @@ function App() {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/signin" element={<SignInWindow />} />
+            {/* <Route path="/signin" element={<SignInWindow />} /> */}
+            <Route path="/signin" element={isAuthenticated ? <HomePage /> : <SignInWindow setEmai = {setEmail}/>} />
             <Route
               path="/signup"
               element={
                 isAuthenticated ? (
                   <ProfileDashboard />
                 ) : (
-                  <SignUpWindow connectWallet={connectWallet} walletAddress={walletAddress} />
+                  <SignUpWindow setEmai = {setEmail} connectWallet={connectWallet} walletAddress={walletAddress} />
                 )
               }
             />
-            <Route path="/profile" element={<ProfileDashboard />} />
+            <Route path="/profile" element={<ProfileDashboard email={email} />} />
             <Route path="/event" element={<EventListing />} />
             <Route path="/organize" element={<EventCreationForm address={walletAddress} />} />
           </Routes>

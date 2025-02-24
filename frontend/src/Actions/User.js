@@ -28,12 +28,24 @@ export const loginUser = (email, password) => async (dispatch) => {
     });
   }
 };
-export const loadUser = () => async (dispatch) => {
+export const loadUser = (email) => async (dispatch) => {
   try {
     dispatch({
       type: "LoadUserRequest",
     });
-    const { data } = await axios.get("/api/v1/me");
+    console.log("Hellooooooooooooooooooo",email)
+    // const { data } = await axios.get("http://localhost:5000/api/v1/me");
+    const { data } = await axios.post(
+      "http://localhost:5000/api/v1/me",
+      { email},
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("........................................");
+    console.log(data);
     dispatch({
       type: "LoadUserSuccess",
       payload: data.user,
@@ -91,15 +103,15 @@ export const logoutUser = () => async (dispatch) => {
     });
   }
 };
-export const registerUser = (name, email, password) => async (dispatch) => {
+export const registerUser = (name, email, password,walletAddress) => async (dispatch) => {
   try {
     dispatch({
       type: "RegisterRequest",
     });
-
+    const walletId = walletAddress
     const { data } = await axios.post(
       "http://localhost:5000/api/v1/register",
-      { name, email, password },
+      { name, email, password,walletId},
       {
         headers: {
           "Content-Type": "application/json",

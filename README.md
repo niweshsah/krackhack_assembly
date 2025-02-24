@@ -4,6 +4,8 @@
 
 TicketChain is a blockchain-based event ticketing system that mints tickets as NFTs, ensuring authenticity, preventing fraud, and enabling a fair secondary marketplace with price controls and royalties for organizers.
 
+[Watch the video](frontend/src/assets/Demonstration%20Video%20TicketChain.mp4)
+
 ---
 
 ## Table of Contents
@@ -11,11 +13,9 @@ TicketChain is a blockchain-based event ticketing system that mints tickets as N
 2. [Tech Stack](#tech-stack)
 3. [Setup and Installation](#setup-and-installation)
 4. [Usage](#usage)
-5. [Smart Contract Details](#smart-contract-details)
-6. [Challenges Faced](#challenges-faced)
-7. [Future Improvements](#future-improvements)
-8. [Contributing](#contributing)
-9. [License](#license)
+5. [NFT Smart Contract Implementation](##nft-smart-contract-implementation)
+6. [Smart Contract Details](#smart-contract-details)
+7. [Challenges Faced](#challenges-faced)
 
 ---
 
@@ -70,7 +70,7 @@ TicketChain is a blockchain-based event ticketing system that mints tickets as N
     
     ```bash
     aptos init --network testnet
-    ``
+    ```
 
 4. Run the Frontend:
 
@@ -85,6 +85,80 @@ TicketChain is a blockchain-based event ticketing system that mints tickets as N
 5. Access the Application:
 
     Open http://localhost:3000 or other in your browser.
+
+## NFT Smart Contract Implementation
+The NFT smart contract is implemented in TypeScript using the Aptos SDK. The main contract logic is located in nft_code/src/main_nft.ts, which handles NFT creation and interactions.
+
+### Running the Contract
+To execute the contract, follow these steps:
+
+   - Navigate to the nft_code directory:
+      ```bash
+      cd nft_code
+      ```
+   - Compile the TypeScript code:
+      ```bash
+      npx tsc
+      ```
+   - Run the generated JavaScript file:
+      ```bash
+      node dist/main_nft.js
+      ```
+   - Sample Execution Output
+      ```bash
+      friday_code@JARVIS:~/Music/krackhack_assembly/nft_code$ npx tsc
+      friday_code@JARVIS:~/Music/krackhack_assembly/nft_code$ node dist/main_nft.js 
+      🎟 Starting NFT Ticketing System
+      ================================
+      
+      1. Creating Accounts
+      -------------------
+      [Aptos SDK] It is recommended that private keys are AIP-80 compliant (https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-80.md). You can fix the private key by formatting it with `PrivateKey.formatPrivateKey(privateKey: string, type: 'ed25519' | 'secp256k1'): string`.
+      [Aptos SDK] It is recommended that private keys are AIP-80 compliant (https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-80.md). You can fix the private key by formatting it with `PrivateKey.formatPrivateKey(privateKey: string, type: 'ed25519' | 'secp256k1'): string`.
+      
+      Current Balances:
+      Organizer Balance: 2.051887 APT
+      User 1 Balance: 2.954989 APT
+      
+      
+      2. Creating Ticket Collection
+      --------------------------
+      🎨 Collection created successfully!
+      
+      3.a Minting VIP Tickets
+      ----------------
+      ✅ Starting to mint 2 VIP ticket NFTs...
+      Minting ticket 1 of 2...
+      Minting ticket 2 of 2...
+      🎟 All 2 Ticket NFTs minted successfully!
+      
+      3.b Minting Normal Tickets
+      ----------------
+      ✅ Starting to mint 2 NORMAL ticket NFTs...
+      Minting ticket 1 of 2...
+      Minting ticket 2 of 2...
+      🎟 All 2 Ticket NFTs minted successfully!
+      
+      4. Initial Ticket Sales
+      ---------------------
+      🛒 0xb5f96a6656d1b7353ea188666db490bdd9091ae7a987a75432e8c742c1995253 is buying a VIP ticket from 0x3e6d013285fe67aec5b7c757498378f31f1b188ff1796488baf0a1e88640edf0 for 0.1 APT
+      
+       sahu will give payment code
+      🎟 VIP ticket successfully transferred to 0xb5f96a6656d1b7353ea188666db490bdd9091ae7a987a75432e8c742c1995253
+      
+      Balances after initial sales:
+      
+      Current Balances:
+      Organizer Balance: 2.048351 APT
+      User 1 Balance: 2.954989 APT
+      
+      
+      Final Balances:
+      
+      Current Balances:
+      Organizer Balance: 2.048351 APT
+      User 1 Balance: 2.954989 APT
+      ```
 
 ## Usage 🎮
 ### For Event Organizers
@@ -151,3 +225,7 @@ TicketChain is a blockchain-based event ticketing system that mints tickets as N
 4. User Experience:
 
     - Added tooltips and guides for non-crypto users.
+      
+
+## Our LOOM video link:
+[Video Link](https://www.loom.com/share/2374c7c8bc7e4031ae2d32c1a4d41f0a?sid=f680aa31-6168-4ea8-8213-5fcc212cd4dd)

@@ -27,7 +27,7 @@ const Header = ({ isSignedIn = false }) => {
       );
     }
     return (
-      <Link to="/signin" className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
+      <Link to="/signup" className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
         <User className="w-5 h-5 text-white" />
         <span className="text-white">Sign Up</span>
       </Link>
@@ -70,7 +70,7 @@ const Header = ({ isSignedIn = false }) => {
                   <Ticket className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-white" />
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-transparent bg-clip-text">
-                  TicketApp
+                  TicketChain
                 </span>
               </div>
 

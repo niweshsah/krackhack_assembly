@@ -140,7 +140,7 @@ const HomePage = () => {
         </div>
       </div>
         <HeroSection/>
-        <div style={{ width: "100vw", height: "100vh" }}>
+        {/* <div style={{ width: "100vw", height: "100vh" }}> */}
       {/* <MircroModel /> */}
       {/* <FloatingElements/> */}
     </div>
@@ -173,7 +173,7 @@ const HomePage = () => {
       </div>
      
     </div>
-      </div>
+      // </div>
   );
 };
 

@@ -3,7 +3,7 @@ import { User, ArrowRight } from 'lucide-react';
 import { useDispatch } from "react-redux";
 import { registerUser } from "./Actions/User";
 import { loginUser } from './Actions/User';
-const SignInWindow = () => {
+const SignInWindow = ({setEmai}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
@@ -40,7 +40,7 @@ const SignInWindow = () => {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {setEmail(e.target.value);setEmai(e.target.value);}}
                     className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3 pl-12 text-white focus:border-pink-400 focus:ring-2 focus:ring-pink-400 transition-colors outline-none"
                     placeholder="Enter your email"
                     required

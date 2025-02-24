@@ -90,8 +90,10 @@ exports.logout = async (req, res) => {
 }
 exports.myProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.body.id);
+    console.log(req.body.email)
+    const user = await User.findOne({ email: req.body.email });
 
+    console.log("User Found : ",user)
     res.status(200).json({
       success: true,
       user,

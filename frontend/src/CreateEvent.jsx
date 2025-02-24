@@ -347,7 +347,9 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { createNewEvent } from './Actions/Event';
 import { TicketingSystem } from '../../nft_code/dist/main_nft_export';
-
+import { useNavigate } from 'react-router-dom';
+// import { Link } from 'lucide-react';
+// import { link } from 'fs';
 const ticketing = new TicketingSystem(); // Keep this outside to avoid re-instantiating
 
 
@@ -361,7 +363,7 @@ const EventCreationForm = () => {
   const [artist, setArtist] = useState('');
   const [tickets, setTickets] = useState([{ category: '', price: 0, desc: '', seats_available: 0 }]);
   // const [organizer, setOrganizer] = useState(null);
-
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleTicketChange = useCallback((index, e) => {
@@ -389,16 +391,16 @@ const EventCreationForm = () => {
 
     try {
       console.log("Creating Ticket Collection..fsdf.");
-
+      console.log(date,time,venue);
+      dispatch(createNewEvent(image , title , date, time, venue, organiser, tickets ));
+      // image, title, date, time, venue, organiser, tickets
       await ticketing.func(title,tickets);
       console.log(tickets);
-      dispatch(createNewEvent({ title, date, time, venue, organiser, artist, tickets }));
       console.log("Event successfully created!");
+      // navigate("/event");
     } catch (error) {
       console.error("Error creating event:", error);
     }
-
-    
   };
 
   return (
@@ -416,7 +418,7 @@ const EventCreationForm = () => {
               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3" />
               <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3" />
               <input type="text" value={venue} onChange={(e) => setVenue(e.target.value)} placeholder="Venue" className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3" />
-              <input type="text" value={organiser} onChange={(e) => setOrganiser(e.target.value)} placeholder="Organiser" className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3" />
+              <input type="text" value={organiser} onChange={(e) => setOrganiser(e.target.value)} placeholder="Organiser's Wallet Address" className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3" />
               <input type="text" value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="Artist" className="w-full bg-gray-800 border border-purple-400 rounded-lg p-3" />
 
               <div>

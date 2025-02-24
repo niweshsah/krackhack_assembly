@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Account, Aptos, AptosConfig, Network, Ed25519PrivateKey, } from "@aptos-labs/ts-sdk";
+import { Account, Aptos, AccountAddress, AptosConfig, Network, Ed25519PrivateKey, } from "@aptos-labs/ts-sdk";
 // import {  } from "aptos";
 // =============== Constants ===============
 const CONFIG = {
@@ -122,6 +122,14 @@ export class TicketingSystem {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log(`✅ Starting to mint ${totalTickets} ${ticketType} ticket NFTs...`);
+                console.log("\nticket name: ", ticketName);
+                console.log("\ncollectionName : ", collectionName);
+
+                console.log("\nticketURI : ", ticketURI);
+                console.log("\ntotalTickets : ", totalTickets);
+                console.log("\nticketType name: ", ticketType);
+                console.log("\n");
+
                 for (let i = 0; i < totalTickets; i++) {
                     console.log(`Minting ticket ${i + 1} of ${totalTickets}...`);
                     const mintTicketTxn = yield this.aptos.mintDigitalAssetTransaction({
@@ -189,7 +197,7 @@ export class TicketingSystem {
                 //     throw new NoTicketsAvailableError(`No ${ticketType} tickets available`);
                 // }
                 // const tokenDataId = firstMatchingToken.token_data_id
-                
+
 
                 const firstMatchingToken = sellerTickets[0];
                 // selling first tickets
@@ -206,7 +214,7 @@ export class TicketingSystem {
                 //   });
                 //   await this.submitTransactionWithRetry(buyer, paymentTxn);
 
-                console.log('\n sahu will give payment code');
+                // console.log('\n sahu will give payment code');
 
 
                 // Transfer ticket
@@ -228,6 +236,8 @@ export class TicketingSystem {
             }
         });
     }
+
+    
     resellTicket(_a) {
         return __awaiter(this, arguments, void 0, function* ({ seller, buyer, resalePrice, organizer, ticketType, }) {
             try {
@@ -264,11 +274,14 @@ export class TicketingSystem {
             }
         });
     }
+
+
+
     createCollection(creator, collectionInfo) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log('name: ', collectionInfo.name);
-                console.log('creator: ',creator);
+                console.log('creator: ', creator);
 
                 const createCollectionTxn = yield this.aptos.createCollectionTransaction({
                     creator,
@@ -308,8 +321,7 @@ export class TicketingSystem {
         });
     }
 
-    func2(buyerAddress)
-    {
+    func2(buyerAddress) {
         return __awaiter(this, void 0, void 0, function* () {
 
             console.log('func2 running');
@@ -319,7 +331,7 @@ export class TicketingSystem {
 
             console.log("\n4. Initial Ticket Sales");
             console.log("---------------------");
-            yield ticketing.buyTicket({
+            yield this.buyTicket({
                 buyerAddress: buyerAddress,
                 seller: organizer,
                 ticketType: "VIP",
@@ -329,10 +341,26 @@ export class TicketingSystem {
 
         });
 
-       
+
     }
 
-    func(title , tickets) {
+    func3(address) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const aliceAddress = AccountAddress.fromString(address);
+            console.log("address: ", aliceAddress);
+
+            // Fetch Alice's digital assets
+            const sellerTickets = yield this.aptos.getOwnedDigitalAssets({
+                ownerAddress: aliceAddress,
+            });
+
+            return sellerTickets;  // ✅ Return the result
+        });
+    }
+
+
+
+    func(title, tickets) {
         return __awaiter(this, void 0, void 0, function* () {
             const backendPrivateKey = new Ed25519PrivateKey("0x7d90b6baf67a4f6e8a9194df96ca1115ce8dfae22b1e980d81e01ac798c2056d");
             const organizer = Account.fromPrivateKey({ privateKey: backendPrivateKey });
@@ -363,22 +391,24 @@ export class TicketingSystem {
             yield this.createCollection(organizer, collectionInfo);
 
 
-            
+
             console.log("\n3.a Minting VIP Tickets");
             console.log("----------------");
             // yield this.mintTicketNFT(organizer, collectionInfo.name, "tickets for event", "https://example.com/vip-ticket", 2, "VIP");
-
+            console.log("collection name: ", collectionInfo.name);
             for (const ticket of tickets) {
+            const ticketName = collectionInfo.name + ' '  + 'ticket';
+
                 yield this.mintTicketNFT(
-                  organizer,
-                  collectionInfo.name,
-                  ticket.description,
-                  "https://example.com/ticket-image", // You can replace this dynamically
-                  ticket.seats_available, // Number of tickets to mint
-                  ticket.category // Ticket category
+                    organizer,
+                    collectionInfo.name,
+                    ticketName,
+                    "https://example.com/ticket-image", // You can replace this dynamically
+                    ticket.seats_available, // Number of tickets to mint
+                    ticket.category // Ticket category
                 );
                 console.log(`Minted ${ticket.seats_available} NFTs for category: ${ticket.category}`);
-              }
+            }
 
 
 
