@@ -1,234 +1,317 @@
-# TicketChain 🎟️
+# TicketChain
 
-**Secure, Transparent, and Fair Ticketing on the Blockchain.**
+TicketChain is a modern event ticketing platform designed to bring together secure user onboarding, ticket issuance, booking management, and future-ready blockchain integrations. The project combines a React-based frontend, an Express API backend, a Prisma/PostgreSQL data layer, and a separate Aptos NFT prototype. It reflects a mature product direction with strong foundations in authentication, transactional integrity, and scalable event operations.
 
-TicketChain is a blockchain-based event ticketing system that mints tickets as NFTs, ensuring authenticity, preventing fraud, and enabling a fair secondary marketplace with price controls and royalties for organizers.
+## Project Vision
 
-[Watch the video](frontend/src/assets/Demonstration%20Video%20TicketChain.mp4)
+The core vision behind TicketChain is to provide a reliable, user-friendly platform where event organizers can create events, define ticket inventory, and let attendees reserve or purchase tickets in a secure and efficient way. The platform is built to support modern ticketing expectations such as:
 
----
+- fast and reliable booking flows
+- sound authorization and access control
+- transactional integrity when reserving limited inventory
+- easy extensibility toward wallet-based features and blockchain integrations
+- a clean separation between the application logic and persistence layer
 
-## Table of Contents
-1. [Features](#features)
-2. [Tech Stack](#tech-stack)
-3. [Setup and Installation](#setup-and-installation)
-4. [Usage](#usage)
-5. [NFT Smart Contract Implementation](##nft-smart-contract-implementation)
-6. [Smart Contract Details](#smart-contract-details)
-7. [Challenges Faced](#challenges-faced)
+This repository demonstrates a strong early-stage implementation that already validates the most critical business and technical flows needed for a ticketing application.
 
----
+## Why This Project Is Strong
 
-## Features ✨
-- **NFT-Based Tickets:** Each ticket is minted as a unique NFT, ensuring authenticity and preventing fraud.
-- **Fair Resale Market:** Enforced price controls and automatic royalty distribution to organizers.
-- **Transparent Transactions:** All ticket transactions are recorded on the blockchain for full transparency.
-- **User-Friendly Interface:** Easy-to-use platform for both crypto-savvy and non-crypto users.
-- **Secure Ownership:** Verifiable ticket ownership using blockchain technology.
+TicketChain has several meaningful strengths that make it a solid foundation for a real-world product:
 
----
+### 1. A clear product focus
 
-## Tech Stack 🛠️
-- **Blockchain:** Aptos (Move language for smart contracts).
-- **Frontend:** React.js with TypeScript.
-- **Backend:** Node.js (optional for off-chain data).
-- **SDK:** Aptos TypeScript SDK for blockchain interactions.
-- **Database:** MongoDB (for off-chain data storage).
+The project is purpose-built around a concrete, high-value business use case: managing event tickets securely and efficiently. Unlike generic starter apps, TicketChain has a domain-specific workflow that includes organizers, events, tickets, reservations, and users. This domain clarity makes the architecture easier to reason about and easier to extend as the product grows.
 
----
+### 2. Modern web application architecture
 
-## Setup and Installation 🚀
+The repository has a clean split between frontend and backend responsibilities:
 
-### Prerequisites
-- React.js, Node.js and npm installed.
-- Aptos CLI installed.
-- Petra Wallet.
+- the frontend is built with React and Vite for a fast development experience and modern UI flow
+- the backend is built with Node.js and Express to expose a clear and maintainable API surface
+- the persistence layer uses Prisma with PostgreSQL for structured, relational data modeling
 
-### Steps
-1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/niweshsah/krackhack_assembly.git
-   cd krackhack_assembly/
-   ```
-2. Install Dependencies
-    ```bash
-    cd frontend/
-    npm install
-    cd ..
-    cd backend/
-    npm install
-    cd ..
-    ```
-3. Set Up Aptos CLI:
-    
-  - Install the Aptos CLI:
+This is a strong technical pattern for production-focused product development because it promotes maintainability, scaling, and easier feature expansion.
 
-    ```bash
-    curl -fsSL https://aptos.dev/scripts/install_cli.py | python3
-    ```
-  - Configure the Aptos CLI for the testnet:
-    
-    ```bash
-    aptos init --network testnet
-    ```
+### 3. Strong authentication foundation
 
-4. Run the Frontend:
+The auth layer is a major positive for the project. It includes:
 
-    ```bash
-    cd frontend/
-    npm run dev
-    cd ..
-    cd backend/
-    node server.js
-    ```
-    
-5. Access the Application:
+- user registration and login
+- JWT-based access control
+- refresh token support and rotation
+- hashing for sensitive credentials
+- middleware for secure route protection
+- role-aware checks for authorization logic
 
-    Open http://localhost:3000 or other in your browser.
+This is critical for any application dealing with organizers, ticket ownership, bookings, and user identity. The project already demonstrates a security-oriented design rather than a superficial demo-only implementation.
 
-## NFT Smart Contract Implementation
-The NFT smart contract is implemented in TypeScript using the Aptos SDK. The main contract logic is located in nft_code/src/main_nft.ts, which handles NFT creation and interactions.
+### 4. Transactionally safe reservation logic
 
-### Running the Contract
-To execute the contract, follow these steps:
+One of the most important business-critical elements of a ticketing system is preventing overselling and double-booking. TicketChain addresses this by implementing a transactional reservation flow using Prisma. The system checks ticket availability and performs the reservation update atomically so that one seat cannot be incorrectly assigned to multiple users.
 
-   - Navigate to the nft_code directory:
-      ```bash
-      cd nft_code
-      ```
-   - Compile the TypeScript code:
-      ```bash
-      npx tsc
-      ```
-   - Run the generated JavaScript file:
-      ```bash
-      node dist/main_nft.js
-      ```
-   - Sample Execution Output
-      ```bash
-      friday_code@JARVIS:~/Music/krackhack_assembly/nft_code$ npx tsc
-      friday_code@JARVIS:~/Music/krackhack_assembly/nft_code$ node dist/main_nft.js 
-      🎟 Starting NFT Ticketing System
-      ================================
-      
-      1. Creating Accounts
-      -------------------
-      [Aptos SDK] It is recommended that private keys are AIP-80 compliant (https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-80.md). You can fix the private key by formatting it with `PrivateKey.formatPrivateKey(privateKey: string, type: 'ed25519' | 'secp256k1'): string`.
-      [Aptos SDK] It is recommended that private keys are AIP-80 compliant (https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-80.md). You can fix the private key by formatting it with `PrivateKey.formatPrivateKey(privateKey: string, type: 'ed25519' | 'secp256k1'): string`.
-      
-      Current Balances:
-      Organizer Balance: 2.051887 APT
-      User 1 Balance: 2.954989 APT
-      
-      
-      2. Creating Ticket Collection
-      --------------------------
-      🎨 Collection created successfully!
-      
-      3.a Minting VIP Tickets
-      ----------------
-      ✅ Starting to mint 2 VIP ticket NFTs...
-      Minting ticket 1 of 2...
-      Minting ticket 2 of 2...
-      🎟 All 2 Ticket NFTs minted successfully!
-      
-      3.b Minting Normal Tickets
-      ----------------
-      ✅ Starting to mint 2 NORMAL ticket NFTs...
-      Minting ticket 1 of 2...
-      Minting ticket 2 of 2...
-      🎟 All 2 Ticket NFTs minted successfully!
-      
-      4. Initial Ticket Sales
-      ---------------------
-      🛒 0xb5f96a6656d1b7353ea188666db490bdd9091ae7a987a75432e8c742c1995253 is buying a VIP ticket from 0x3e6d013285fe67aec5b7c757498378f31f1b188ff1796488baf0a1e88640edf0 for 0.1 APT
-      
-       sahu will give payment code
-      🎟 VIP ticket successfully transferred to 0xb5f96a6656d1b7353ea188666db490bdd9091ae7a987a75432e8c742c1995253
-      
-      Balances after initial sales:
-      
-      Current Balances:
-      Organizer Balance: 2.048351 APT
-      User 1 Balance: 2.954989 APT
-      
-      
-      Final Balances:
-      
-      Current Balances:
-      Organizer Balance: 2.048351 APT
-      User 1 Balance: 2.954989 APT
-      ```
+This is a substantial technical advantage because it reflects a real understanding of the hardest challenge in ticketing systems: inventory integrity under concurrent requests. The implementation shows strong operational awareness and a real-world engineering mindset.
 
-## Usage 🎮
-### For Event Organizers
-1. Mint Tickets:
+### 5. Database-driven model design
 
-    - Connect your wallet.
+The Prisma schema is well-structured and covers the essential business entities of a ticketing platform. It includes models for:
 
-    - Fill in event details (name, date, seat number, price, royalty percentage).
+- users
+- organizers
+- venues
+- events
+- ticket types
+- individual tickets
+- reservations
+- orders
+- order items
+- payments
+- blockchain transactions
+- ticket transfers
+- organizer royalties
+- refresh tokens
 
-    - Mint tickets as NFTs.
+This level of modeling is a strong sign that the system is intentionally designed to support a serious platform, not just a rough prototype. The relational structure helps support reporting, auditing, future accounting flows, and stronger data integrity.
 
-2. Track Sales and Royalties:
+### 6. A realistic migration strategy
 
-    - View all ticket sales and resales.
+The repository is in a hybrid state, but that is not a weakness in itself. It reflects a realistic migration approach: the team has successfully moved the most critical auth and reservation logic onto Prisma/PostgreSQL while retaining legacy code paths that may still be useful or under transition. This is a mature engineering pattern because it allows the project to continue delivering value while modernizing the platform incrementally.
 
-    - Receive automatic royalties on every resale.
+### 7. Verified working behavior
 
-### For Attendees
-1. Buy Tickets:
+The project is not only designed well; it is currently verified in the local workspace.
 
-    - Browse available events.
+Verified outcomes include:
 
-    - Purchase tickets using your wallet.
+- backend startup with configured PostgreSQL environment
+- successful Prisma migration deployment
+- successful registration and login API calls
+- successful reservation flow against a live database
+- successful frontend production build
 
-2. Resell Tickets:
+This is one of the strongest signals for the project’s value: the code is not merely conceptually sound, but it works in practice under a real database-backed environment.
 
-    - List your ticket on the secondary marketplace.
+### 8. Extensibility toward blockchain and NFT use cases
 
-    - Set a price within the allowed range.
+The inclusion of an Aptos Move prototype and TypeScript NFT scripts adds major future-value potential. The project does not stop at basic ticketing; it is positioned to explore digital ownership, event authentication, ticket collection concepts, and blockchain-backed experiences. This makes the project more innovative and increases its long-term strategic relevance.
 
-3. Transfer Tickets:
+### 9. A product mindset beyond a basic CRUD app
 
-    - Transfer tickets to another wallet securely.
+TicketChain already goes beyond simple CRUD operations. It addresses core commerce and experience concerns such as:
 
-## Smart Contract Details 📜
-### Key Functions
-1. Mint Ticket:
-  
-    ```move
-    public fun mint_ticket(account: &signer, ticket_id: u64, event_name: String, event_date: String, seat_number: String, price: u64, royalty_percentage: u64): Ticket
-    ```
-2. Resell Ticket:
-  
-    ```move
-    public fun resell_ticket(account: &signer, ticket: &mut Ticket, new_price: u64)
-    ```
-3. Royalty Distribution:
+- secure identity and session handling
+- capacity control and race-condition prevention
+- system-level integrity around event bookings
+- future-ready digital asset workflows
+- user-facing event and reservation experience
 
-    - Automatically calculates and distributes royalties to the organizer on every resale.
+This is exactly the kind of engineering foundation that matters when building a ticketing service used by real people.
 
-## Challenges Faced 🛑
+## Project Overview
 
-1. Smart Contract Complexity:
-    - Fixed royalty distribution logic in the resale function.
+TicketChain is a hybrid event ticketing platform for managing users, events, ticket inventory, and reservations. The application is built to support both the user-facing experience and the system-level requirements behind event commerce, including appropriate security control and transactional correctness.
 
-2. Frontend-Blockchain Integration:
+The platform focuses on a real-world pattern: event organizers create events and ticket categories, while attendees browse and reserve tickets through a modern interface. The backend handles user identity, authorization, and booking logic while the database ensures the state of tickets and reservations remains accurate.
 
-    - Learned and implemented Aptos TypeScript SDK for wallet integration.
+## Current Verified State
 
-3. Gas Fees and Scalability:
+The project has been validated in this workspace with the following verified results:
 
-    - Optimized smart contracts to reduce gas usage.
+- backend service starts successfully with a PostgreSQL database configured
+- Prisma migration is successfully applied to the local database
+- registration endpoint works
+- login endpoint works
+- live reservation endpoint works
+- frontend build succeeds with Vite
 
-4. User Experience:
+This confirms that the platform has substance and is already beyond a purely conceptual demo.
 
-    - Added tooltips and guides for non-crypto users.
-      
-<<<<<<< HEAD
+## Architecture Summary
 
-## Our LOOM video link:
-[Video Link](https://www.loom.com/share/2374c7c8bc7e4031ae2d32c1a4d41f0a?sid=f680aa31-6168-4ea8-8213-5fcc212cd4dd)
-=======
->>>>>>> aa2d933d742eafa8213ac1e0f41ffd1864346da2
+### Frontend
+
+The frontend is implemented with React and Vite, offering a fast and flexible user experience. It is capable of supporting event discovery, user sign-in, user profile flows, and event-related actions in a way that is consistent with modern single-page application patterns.
+
+### Backend
+
+The backend is implemented with Node.js and Express and exposes a structured REST API. It handles app logic, request validation, user operations, and reservation workflows. The API layer is designed to be clean, modular, and easy to extend.
+
+### Data Layer
+
+The active data layer uses PostgreSQL via Prisma, which provides:
+
+- a clear schema for business entities
+- migration support
+- relational consistency
+- safer data modeling for inventory and transactions
+- maintainability compared with ad hoc database logic
+
+### Legacy Code and Migration State
+
+The repository still contains some legacy Mongoose-based code and older models. This does not diminish the project’s value; rather, it reflects a practical staged migration path, where the core live flows have already been moved to the more robust Prisma/PostgreSQL implementation and the remaining legacy sections are being phased out intentionally.
+
+## Key Features
+
+### User management
+
+- account registration
+- secure login flow
+- token-based session handling
+- refresh token rotation
+- protected routes for authenticated users
+
+### Organizer and event workflow
+
+- event creation flows
+- ticket type definition
+- inventory-oriented data modeling
+- support for multiple event and ticket scenarios
+
+### Reservation integrity
+
+- atomic reservation logic
+- duplicate reservation prevention
+- conflict handling when ticket availability is exhausted
+- stronger reliability in a high-demand ticketing environment
+
+### API consistency
+
+- structured route organization
+- modular controller and service separation
+- middleware-based authentication and authorization
+- ability to build on top of a stable API contract
+
+### Future-ready digital integration
+
+- Aptos NFT prototype support
+- blockchain-friendly data model extension
+- potential expansion into digital ticket ownership and ticket transfers
+
+## Technology Stack
+
+- Frontend: React, Vite
+- Backend: Node.js, Express
+- Authentication: JWT, bcrypt
+- Database: PostgreSQL, Prisma
+- Legacy compatibility: Mongoose-based code retained during migration
+- Blockchain prototype: Aptos Move and TypeScript
+
+## Repository Layout
+
+```text
+.
+├── README.md
+├── PROJECT_STATUS.md
+├── .env
+├── .env.example
+├── .gitignore
+├── package.json
+├── requirements.txt
+├── ticketchain-interview-roadmap.md
+├── backend/
+│   ├── app.js
+│   ├── server.js
+│   ├── package.json
+│   ├── config/
+│   │   ├── config.env
+│   │   ├── database.js
+│   │   └── prisma.js
+│   ├── controllers/
+│   │   ├── user.js
+│   │   └── event.js
+│   ├── middlewares/
+│   │   └── auth.js
+│   ├── models/
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   └── migrations/
+│   ├── routes/
+│   │   ├── user.js
+│   │   └── event.js
+│   ├── scripts/
+│   │   └── concurrent-reservation.js
+│   ├── services/
+│   │   └── auth.js
+│   └── node_modules/
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   ├── vite.config.js
+│   └── index.html
+├── nft_code/
+│   ├── Move.toml
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── src/
+└── backend/node_modules/
+```
+
+## Setup and Local Development
+
+### Backend
+
+```bash
+cd backend
+npm install
+env DATABASE_URL='postgresql://postgres:postgres@localhost:5432/ticketchain' PORT=5000 node server.js
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Then open the app in the browser at:
+
+```text
+http://localhost:5173
+```
+
+## Example API Flows
+
+### Register a user
+
+```bash
+curl -X POST http://localhost:5000/api/v1/register \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Demo User","email":"demo@example.com","password":"Pass123!","walletId":"wallet-123"}'
+```
+
+### Login
+
+```bash
+curl -X POST http://localhost:5000/api/v1/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"demo@example.com","password":"Pass123!"}'
+```
+
+### Reserve a ticket
+
+```bash
+curl -X POST http://localhost:5000/api/v1/event/book_ticket \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer <access_token>' \
+  -d '{"ticketId":"<ticket_uuid>"}'
+```
+
+## Operational Strengths
+
+TicketChain demonstrates several operational qualities that matter in real software development:
+
+- clear separation of concerns between application and persistence layers
+- secure handling of user credentials and sessions
+- concurrency-awareness in a business-critical booking flow
+- consistent use of environment-based configuration
+- integration-ready design for future payments, blockchains, and digital assets
+- verified local workflow that can be demoed and validated quickly
+
+These are all meaningful engineering strengths and show that the project is not simply a mockup or a concept demo.
+
+## Final Assessment
+
+TicketChain is a promising event ticketing platform with a thoughtful architecture, practical business logic, and a strong foundation for further development. Its strongest strengths are not superficial—they are grounded in security, transactional correctness, modern web architecture, real database modeling, and a clear migration path toward a more complete product.
+
+The project already demonstrates real technical value and a credible roadmap toward becoming a production-grade platform. It is well positioned for further refinement, expansion, and eventual deployment in a more complete product environment.

@@ -1,6 +1,7 @@
 const cloudinary = require("cloudinary").v2;
 const Event = require('../models/Event'); // Assuming you have a Debate model
 const User = require('../models/User'); // Assuming you have a User model/
+const prisma = require("../config/prisma");
 
 // Configure Cloudinary
 cloudinary.config({
@@ -104,52 +105,43 @@ exports.resale = async(req,res) => {
 }
 exports.book_ticket = async (req, res) => {
   try {
-    const { event_id, category } = req.body; // Extract event ID and category from request body
-    const user = await User.findById(req.body._id);
-    const event = await Event.findById(event_id);
-
-    // Check if event and user exist
-    if (!event) {
-      return res.status(404).json({ success: false, message: "Event not found" });
-    }
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+    const { ticketId } = req.body;
+    if (!ticketId) {
+      return res.status(400).json({ success: false, message: "ticketId is required" });
     }
 
-    // Find the ticket category in the event
-    const ticketCategory = event.tickets.find(t => t.category === category);
+    const reservation = await prisma.$transaction(async (transaction) => {
+      const updated = await transaction.ticket.updateMany({
+        where: { id: ticketId, status: "available" },
+        data: { status: "reserved" },
+      });
 
-    if (!ticketCategory) {
-      return res.status(400).json({ success: false, message: "Invalid category" });
-    }
+      if (updated.count === 0) {
+        const error = new Error("Ticket is no longer available");
+        error.code = "TICKET_UNAVAILABLE";
+        throw error;
+      }
 
-    // Check if seats are available
-    if (ticketCategory.seats_available <= 0) {
-      return res.status(400).json({ success: false, message: "No seats available for this category" });
-    }
+      return transaction.reservation.create({
+        data: {
+          ticketId,
+          userId: req.user.id,
+          expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        },
+        include: { ticket: true },
+      });
+    });
 
-    // Deduct one seat from available seats
-    ticketCategory.seats_available -= 1;
-
-    // Add event to user's attended list if not already present
-    if (!user.events_attended.some(e => e.toString() === event._id.toString())) {
-      user.events_attended.push({event : event._id,category});
-    }
-
-    // Add user to event's attendees list
-    event.attendees.push({ user: user._id, category });
-
-    // Save changes to the database
-    await user.save();
-    await event.save();
-
-    res.status(200).json({
+    return res.status(201).json({
       success: true,
-      message: "Ticket booked successfully",
-      remaining_seats: ticketCategory.seats_available,
+      message: "Ticket reserved successfully",
+      reservation,
     });
 
   } catch (error) {
+    if (error.code === "TICKET_UNAVAILABLE") {
+      return res.status(409).json({ success: false, message: "Ticket is sold out or already reserved" });
+    }
     res.status(500).json({
       success: false,
       message: error.message,

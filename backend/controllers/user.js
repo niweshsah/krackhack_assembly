@@ -1,5 +1,5 @@
-const User = require("../models/User")
-const Event = require("../models/Event");
+const prisma = require("../config/prisma");
+const { login: loginWithPostgres, register: registerWithPostgres, refresh: refreshTokens, revokeRefreshToken } = require("../services/auth");
 const cloudinary = require("cloudinary").v2;
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,71 +9,39 @@ cloudinary.config({
 exports.register = async (req, res) => {
   try {
     const { name, email, password, walletId } = req.body;
-    let user = await User.findOne({ email });
-    if (user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User already exists" });
-    }
-    user = await User.create({
-      name,
-      email,
-      password,
-      walletId
-    })
-    const token = await user.generateToken();
-    return res.status(200).cookie("token", token, { expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), httpOnly: true }).json({
-      success: true,
-      user,
-      token,
-    });
+    const result = await registerWithPostgres({ name, email, password, walletAddress: walletId });
+    return res.status(201).json({ success: true, ...result });
   } catch (error) {
-    res.status(500).json({
+    const statusCode = error.code === "P2002" ? 409 : 500;
+    res.status(statusCode).json({
       success: false,
-      message: error.message
+      message: statusCode === 409 ? "User already exists" : error.message
     })
   }
 }
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email }).select("+password");
-    // Select + password is compulsory because if we do not write it we will not be able to access this.password while matching password
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User does not exist"
-      });
-    }
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) {
-      return res.status(400).json({
-        success: false,
-        message: "Incorrect Password"
-      });
-    }
-    const token = await user.generateToken();
-    // console.log(token)
-    // return res.status(200).json({
-    //   success: true,
-    //   token: token
-    // })
-    res.status(200).json({
-      success: true,
-      message: "Logged in successfully",
-      user
-  });
+    const result = await loginWithPostgres({ email, password });
+    res.status(200).json({ success: true, message: "Logged in successfully", ...result });
   } catch (error) {
-    res.status(500).json({
+    res.status(error.statusCode || 500).json({
       success: false,
       message: error.message
     })
   }
 }
+exports.refresh = async (req, res) => {
+  try {
+    const result = await refreshTokens(req.body.refreshToken);
+    return res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({ success: false, message: error.message });
+  }
+};
 exports.logout = async (req, res) => {
   try {
-    // const user = await User.findById(req.user._id);
-    // await user.deleteOne();
+    await revokeRefreshToken(req.body?.refreshToken);
     res
       .status(200)
       .cookie("token", null, { expires: new Date(Date.now()), httpOnly: true })
@@ -90,10 +58,14 @@ exports.logout = async (req, res) => {
 }
 exports.myProfile = async (req, res) => {
   try {
-    console.log(req.body.email)
-    const user = await User.findOne({ email: req.body.email });
+    const email = req.body.email || req.user?.email;
 
-    console.log("User Found : ",user)
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+
     res.status(200).json({
       success: true,
       user,
@@ -107,9 +79,11 @@ exports.myProfile = async (req, res) => {
 };
 exports.getAllUsers = async (req, res) => {
   try {
-    const query = req.query.name ? { name: { $regex: req.query.name, $options: "i" } } : {};
-
-    const users = await User.find(query);
+    const name = req.query.name;
+    const users = await prisma.user.findMany({
+      where: name ? { name: { contains: String(name), mode: "insensitive" } } : undefined,
+      orderBy: { createdAt: "desc" },
+    });
 
     res.status(200).json({
       success: true,

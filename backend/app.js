@@ -1,15 +1,13 @@
 const express = require("express");
-const { Server } = require("socket.io");
 const { createServer } = require("http");
-const cors = require("cors");  // Use require instead of import
-const app = express();
+const path = require("path");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
-require("dotenv").config({ path: require("path").resolve(__dirname, "../.env") });
-// app.use(express.json({ limit: '10mb' }));  // Example to increase limit to 10 MB
-// app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-// if (process.env.NODE_ENV !== "production") {
-//     require("dotenv").config({ path: "backend/config/config.env" });
-// }
+
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+
+const app = express();
+
 app.use(cors({
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
@@ -18,15 +16,16 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-// const event = require("./routes/event");
-const user = require("./routes/user");
-// app.use("/api/v1", event);
-app.use("/api/v1", user);
-const server = createServer(app);
-// Start server
-const port = 5000;
-server.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
 
-module.exports = app;
+const user = require("./routes/user");
+app.use("/api/v1", user);
+
+if (require.main === module) {
+    const server = createServer(app);
+    const port = Number(process.env.PORT || 5000);
+    server.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
+}
+
+module.exports = { app };
