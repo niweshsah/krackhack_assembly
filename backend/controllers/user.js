@@ -1,11 +1,5 @@
 const prisma = require("../config/prisma");
 const { login: loginWithPostgres, register: registerWithPostgres, refresh: refreshTokens, revokeRefreshToken } = require("../services/auth");
-const cloudinary = require("cloudinary").v2;
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 exports.register = async (req, res) => {
   try {
     const { name, email, password, walletId } = req.body;

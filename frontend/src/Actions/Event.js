@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
 export const getEvents =
     (name = "") =>
@@ -7,7 +8,7 @@ export const getEvents =
                 dispatch({
                     type: "allEventsRequest",
                 });
-                const { data } = await axios.get("http://localhost:5000/api/v1/events");
+                const { data } = await axios.get(`${API_BASE_URL}/events`);
                 dispatch({
                     type: "allEventsSuccess",
                     payload: data.events,
@@ -81,7 +82,7 @@ export const createNewEvent = (image, title, date, time, venue, organiser, ticke
         console.log("--------------------------------------------------------");
         // const { data } = await axios.get(`/api/v1/post/${id}`);
         const { data } = await axios.post(
-            "http://localhost:5000/api/v1/event/create",
+            `${API_BASE_URL}/event/create`,
             { image, title, date, time, venue, organiser,tickets},
             {
                 headers: {

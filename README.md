@@ -72,9 +72,9 @@ The Prisma schema is well-structured and covers the essential business entities 
 
 This level of modeling is a strong sign that the system is intentionally designed to support a serious platform, not just a rough prototype. The relational structure helps support reporting, auditing, future accounting flows, and stronger data integrity.
 
-### 6. A realistic migration strategy
+### 6. A completed backend migration
 
-The repository is in a hybrid state, but that is not a weakness in itself. It reflects a realistic migration approach: the team has successfully moved the most critical auth and reservation logic onto Prisma/PostgreSQL while retaining legacy code paths that may still be useful or under transition. This is a mature engineering pattern because it allows the project to continue delivering value while modernizing the platform incrementally.
+The backend now uses Prisma and PostgreSQL for authentication, event management, reviews, ticket inventory, and reservations. The earlier Mongoose models, Mongo connection, and duplicate legacy event route have been retired, leaving one active relational data path for the core application.
 
 ### 7. Verified working behavior
 
@@ -145,9 +145,9 @@ The active data layer uses PostgreSQL via Prisma, which provides:
 - safer data modeling for inventory and transactions
 - maintainability compared with ad hoc database logic
 
-### Legacy Code and Migration State
+### Backend Data Architecture
 
-The repository still contains some legacy Mongoose-based code and older models. This does not diminish the project’s value; rather, it reflects a practical staged migration path, where the core live flows have already been moved to the more robust Prisma/PostgreSQL implementation and the remaining legacy sections are being phased out intentionally.
+The active backend data layer is unified on PostgreSQL through Prisma. Compatibility mapping at the event API boundary preserves the existing frontend payload shape while storing organizers, venues, ticket types, individual ticket inventory, reviews, and reservations as relational records.
 
 ## Key Features
 
@@ -192,7 +192,7 @@ The repository still contains some legacy Mongoose-based code and older models. 
 - Backend: Node.js, Express
 - Authentication: JWT, bcrypt
 - Database: PostgreSQL, Prisma
-- Legacy compatibility: Mongoose-based code retained during migration
+- Data migration: Prisma/PostgreSQL is the active backend data layer
 - Blockchain prototype: Aptos Move and TypeScript
 
 ## Repository Layout

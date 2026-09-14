@@ -1,22 +1,28 @@
 {
-  "name": "nft_code",
-  "version": "1.0.0",
-  "description": "for krackhack",
-  "main": "index.js",
+  "name": "ticketchain-nft-prototype",
+  "version": "0.1.0",
+  "description": "Aptos NFT prototype for TicketChain event ticketing, digital verification, and future blockchain-ready ticket experiences.",
+  "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "clean": "rm -rf dist",
+    "dev": "ts-node src/main.ts",
+    "start": "node dist/main.js",
+    "demo": "node dist/main.js --demo"
+  },
+  "author": "TicketChain",
+  "license": "MIT",
   "dependencies": {
-    "@aptos-labs/ts-sdk": "^1.35.0",
-    "@aptos-labs/wallet-adapter-ant-design": "^4.0.3",
-    "@aptos-labs/wallet-adapter-react": "^4.1.0"
+    "@aptos-labs/ts-sdk": "^1.35.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+  }
 }

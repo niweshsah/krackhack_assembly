@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { API_BASE_URL } from "../config";
 
 export const loginUser = (email, password) => async (dispatch) => {
   try {
@@ -8,7 +9,7 @@ export const loginUser = (email, password) => async (dispatch) => {
     });
 
     const { data } = await axios.post(
-      "http://localhost:5000/api/v1/login",
+      `${API_BASE_URL}/login`,
       { email, password },
       {
         headers: {
@@ -36,7 +37,7 @@ export const loadUser = (email) => async (dispatch) => {
     console.log("Hellooooooooooooooooooo",email)
     // const { data } = await axios.get("http://localhost:5000/api/v1/me");
     const { data } = await axios.post(
-      "http://localhost:5000/api/v1/me",
+      `${API_BASE_URL}/me`,
       { email},
       {
         headers: {
@@ -110,7 +111,7 @@ export const registerUser = (name, email, password,walletAddress) => async (disp
     });
     const walletId = walletAddress
     const { data } = await axios.post(
-      "http://localhost:5000/api/v1/register",
+      `${API_BASE_URL}/register`,
       { name, email, password,walletId},
       {
         headers: {

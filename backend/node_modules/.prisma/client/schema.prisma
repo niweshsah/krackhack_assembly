@@ -73,6 +73,7 @@ model User {
   ownedTickets        Ticket[]         @relation("CurrentTicketOwner")
   ticketTransfersFrom TicketTransfer[] @relation("TransferFromUser")
   ticketTransfersTo   TicketTransfer[] @relation("TransferToUser")
+  reviews             EventReview[]
 }
 
 model RefreshToken {
@@ -114,9 +115,9 @@ model Venue {
 }
 
 model Event {
-  id          String       @id @default(uuid()) @db.Uuid
-  organizerId String       @db.Uuid
-  venueId     String       @db.Uuid
+  id          String        @id @default(uuid()) @db.Uuid
+  organizerId String        @db.Uuid
+  venueId     String        @db.Uuid
   title       String
   description String?
   category    String?
@@ -124,14 +125,28 @@ model Event {
   imageUrl    String?
   startsAt    DateTime
   endsAt      DateTime?
-  status      EventStatus  @default(draft)
-  organizer   Organizer    @relation(fields: [organizerId], references: [id], onDelete: Restrict)
-  venue       Venue        @relation(fields: [venueId], references: [id], onDelete: Restrict)
+  status      EventStatus   @default(draft)
+  organizer   Organizer     @relation(fields: [organizerId], references: [id], onDelete: Restrict)
+  venue       Venue         @relation(fields: [venueId], references: [id], onDelete: Restrict)
   ticketTypes TicketType[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  reviews     EventReview[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   @@index([status, startsAt])
+}
+
+model EventReview {
+  id        String   @id @default(uuid()) @db.Uuid
+  eventId   String   @db.Uuid
+  userId    String   @db.Uuid
+  comment   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+  @@index([eventId, createdAt])
 }
 
 model TicketType {

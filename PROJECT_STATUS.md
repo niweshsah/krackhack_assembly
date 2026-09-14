@@ -2,7 +2,7 @@
 
 ## Overview
 
-TicketChain is a hybrid event ticketing platform with a React frontend, an Express API backend, a PostgreSQL-backed Prisma data layer, and a separate Aptos NFT prototype. The project is currently in a transitional state: the authentication and ticket reservation flows are now validated against PostgreSQL, while several legacy event and profile paths still reflect the earlier Mongoose-based implementation.
+TicketChain is an event ticketing platform with a React frontend, an Express API backend, a PostgreSQL-backed Prisma data layer, and a separate Aptos NFT prototype. The backend core is now unified on Prisma/PostgreSQL for authentication, events, reviews, ticket inventory, and reservations.
 
 ## Current Verified State
 
@@ -29,7 +29,7 @@ This means the repository is operational in a hybrid state, but it has not yet b
 - Node.js + Express
 - JWT-based authentication
 - Prisma ORM with PostgreSQL
-- Legacy Mongoose code still exists in older modules and routes
+- The NFT prototype remains intentionally separate from the web application backend
 
 ### Data Model
 
@@ -110,7 +110,7 @@ The Aptos Move and TypeScript NFT code exists under the nft_code directory. It i
 - Frontend: React, Vite, Redux-style state management
 - Backend: Node.js, Express, JWT, bcrypt
 - Database: PostgreSQL via Prisma
-- Legacy code: MongoDB/Mongoose still present in older implementation paths
+- Backend data layer: Prisma/PostgreSQL
 - Blockchain prototype: Aptos Move + TypeScript scripts
 
 ## Current Implementation Highlights
@@ -156,7 +156,6 @@ Example values:
 ```dotenv
 PORT=5000
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ticketchain
-MONGO_URI=mongodb://localhost:27017/ticketchain
 JWT_SECRET=dev-local-jwt-secret-change-me
 CLOUDINARY_CLOUD_NAME=demo-cloud-name
 CLOUDINARY_API_KEY=demo-api-key
@@ -199,21 +198,17 @@ The following commands were validated:
 
 ## Current Risks and Limitations
 
-The repository is not yet fully standardized to a single architecture. The main limitations are:
+The repository now has a unified backend data architecture. The main remaining limitations are:
 
-- legacy Mongoose models remain in the codebase
-- some event/profile code paths still reflect the old stack
-- frontend API URLs are not yet fully centralized
+- some frontend actions still use older request and token conventions
 - NFT minting is not connected to the live backend
 - production-ready operational tooling such as Docker Compose, health checks, and deployment automation is not complete
 
 ## Recommended Next Steps
 
-1. Remove or formally retire legacy Mongoose routes and models.
-2. Standardize frontend API configuration and auth token handling.
-3. Consolidate the remaining event flows onto the Prisma/PostgreSQL stack.
-4. Add production-grade environment and deployment configuration.
-5. Connect the NFT workflow to the backend only after product requirements are finalized.
+1. Standardize frontend API configuration and auth token handling.
+2. Add production-grade environment and deployment configuration.
+3. Connect the NFT workflow to the backend only after product requirements are finalized.
 
 ## Conclusion
 
