@@ -2,3 +2,7 @@
 /nft_code/build
 /nft_code/.aptos
 
+.env
+.env.*
+!.env.example
+

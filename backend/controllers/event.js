@@ -4,9 +4,9 @@ const User = require('../models/User'); // Assuming you have a User model/
 
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: 'dvqfxjfia', // Replace with your actual Cloudinary cloud name
-  api_key: '452653768355675', // Replace with your actual Cloudinary API key
-  api_secret: 'W45YS0MwZnIvwPdOo5LdS5fRZ3s', // Replace with your actual Cloudinary API secret
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 exports.createEvent = async (req, res) => {

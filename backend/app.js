@@ -4,12 +4,12 @@ const { createServer } = require("http");
 const cors = require("cors");  // Use require instead of import
 const app = express();
 const cookieParser = require("cookie-parser");
+require("dotenv").config({ path: require("path").resolve(__dirname, "../.env") });
 // app.use(express.json({ limit: '10mb' }));  // Example to increase limit to 10 MB
 // app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // if (process.env.NODE_ENV !== "production") {
 //     require("dotenv").config({ path: "backend/config/config.env" });
 // }
-require("dotenv").config({ path: "/config/config.env" });
 app.use(cors({
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
